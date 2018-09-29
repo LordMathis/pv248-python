@@ -8,7 +8,10 @@ type = sys.argv[2]
 results = []
 
 composer_start = 'Composer:'
-century_start = 'Composition year:'
+century_start = 'Composition Year:'
+
+century_regex = re.compile('\d\dth')
+year_regex = re.compile('\d\d\d\d')
 
 with open(input, 'r') as ins:
     if type == 'composer':
@@ -24,7 +27,30 @@ with open(input, 'r') as ins:
                     else:
                         results.append(comp)
 
+    elif type == 'century':
+        for line in ins:
+            if century_start in line:
+                line = line[len(century_start):].strip()
+
+                if not line:
+                    continue
+
+                match = re.match(century_regex, line)
+                if match is not None:
+                    results.append(match.group(0) + ' century')
+                    continue
+
+                match = re.match(year_regex, line)
+                if match is not None:
+                    year = int(match.group(0))
+                    century = year // 100
+                    if year % 100 > 0:
+                        century += 1
+                    results.append(str(century) + 'th century')
+
+
 results_counter = Counter(results)
 
 for key in results_counter:
+
     print("%s: %s" % (key, results_counter[key]))
