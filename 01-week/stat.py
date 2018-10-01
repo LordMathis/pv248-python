@@ -2,55 +2,76 @@ import sys
 import re
 from collections import Counter
 
-input = sys.argv[1]
-type = sys.argv[2]
+def year_to_century(year):
+    century = year // 100
+    if year % 100 > 0:
+        century += 1
+    return str(century)
 
-results = []
+def print_results(results):
+    for key in results:
+        print("%s: %s" % (key, results[key]))
 
-composer_start = 'Composer:'
-century_start = 'Composition Year:'
+def process_composers(composer_line):
+    line = re.sub('\(.*\)', "", composer_line)
+    comps = line.split(';')
+    results = []
+    for comp in comps:
+        comp = comp.strip()
+        if not comp:
+            continue
+        else:
+            results.append(comp)
+    return results
 
-century_regex = re.compile('\d\dth')
-year_regex = re.compile('\d\d\d\d')
+def process_centuries(century_line, century_regex, year_regex):
 
-with open(input, 'r') as ins:
-    if type == 'composer':
-        for line in ins:
-            if composer_start in line:
-                line = line[len(composer_start):]
-                line = re.sub('\(.*\)', "", line)
-                comps = line.split(';')
-                for comp in comps:
-                    comp = comp.strip()
-                    if not line:
-                        continue
-                    else:
-                        results.append(comp)
+    results = []
 
-    elif type == 'century':
-        for line in ins:
-            if century_start in line:
-                line = line[len(century_start):].strip()
+    if not century_line:
+        return None
 
-                if not line:
-                    continue
+    match = re.search(century_regex, century_line)
+    if match is not None:
+        return match.group(0) + ' century'
 
-                match = re.match(century_regex, line)
-                if match is not None:
-                    results.append(match.group(0) + ' century')
-                    continue
+    match = re.search(year_regex, century_line)
+    if match is not None:
+        year = int(match.group(0))
+        century = year_to_century(year)
+        return century + 'th century'
 
-                match = re.match(year_regex, line)
-                if match is not None:
-                    year = int(match.group(0))
-                    century = year // 100
-                    if year % 100 > 0:
-                        century += 1
-                    results.append(str(century) + 'th century')
+def main(input, type):
+
+    results = []
+
+    composer_start = 'Composer:'
+    century_start = 'Composition Year:'
+
+    century_regex = re.compile('\d\dth')
+    year_regex = re.compile('\d\d\d\d')
+
+    with open(input, 'r') as ins:
+        if type == 'composer':
+            for line in ins:
+                if composer_start in line:
+                    line = line[len(composer_start):]
+                    composers = process_composers(line)
+                    results.extend(composers)
+
+        elif type == 'century':
+            for line in ins:
+                if century_start in line:
+                    line = line[len(century_start):].strip()
+                    centuries = process_centuries(line, century_regex, year_regex)
+                    results.append(centuries)
 
 
-results_counter = Counter(results)
+    results = [r for r in results if r is not None]
+    results_counter = Counter(results)
+    print_results(results_counter)
 
-for key in results_counter:
-
-    print("%s: %s" % (key, results_counter[key]))
+if __name__ == '__main__':
+    input = sys.argv[1]
+    type = sys.argv[2]
+    main(input, type)
