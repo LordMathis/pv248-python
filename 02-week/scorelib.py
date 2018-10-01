@@ -20,16 +20,16 @@ class Print:
                 composers.append(author.name)
         composers_str = "; ".join(composers)
 
-        editors = "; ".join(a.name for a in self.edition.authors)
+        editors = ", ".join(a.name for a in self.edition.authors)
 
         print("Print Number: %s" % (str(self.print_id)))
-        print("Composers: %s" % composers_str)
+        print("Composer: %s" % composers_str)
         print("Title: %s" % (comp.name if comp.name else ""))
         print("Genre: %s" % (comp.genre if comp.genre else ""))
         print("Key: %s" % (comp.key if comp.key else ""))
         print("Composition Year: %s" % (comp.year if comp.year else ""))
         print("Edition: %s" % (self.edition.name if self.edition.name else ""))
-        print("Editors: %s" % editors)
+        print("Editor: %s" % editors)
         for i, voice in enumerate(comp.voices):
             if voice.range:
                 print("Voice %d: %s %s" % (i+1, voice.name, voice.range))
@@ -80,7 +80,7 @@ def get_composers(composers):
     results = []
 
     for composer in composers:
-        name = re.sub('\(.*\)', "", composer)
+        name = re.sub('\(.*\)', "", composer).strip()
 
         born, died = None, None
         match = re.search(year_regex, composer)
@@ -100,6 +100,7 @@ def get_year(line):
 
 def get_editors(line):
     results = []
+
     editors = line.split(',')
 
     if len(editors) < 2:
@@ -110,7 +111,7 @@ def get_editors(line):
             names.append(editors[i] + ',' + editors[i+1])
 
     for name in names:
-        results.append(Person(name))
+        results.append(Person(name.strip()))
 
     return results
 
@@ -123,7 +124,7 @@ def get_voice(line):
     else:
         name = line
 
-    return Voice(name, voice_range)
+    return Voice(name.strip(), voice_range)
 
 
 def load(filename):
@@ -144,8 +145,9 @@ def load(filename):
         if new_print:
             prints.append(new_print)
 
-
+    prints.sort(key=lambda x: x.print_id)
     return prints
+
 
 def process_print(lines):
 
