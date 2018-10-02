@@ -83,11 +83,14 @@ def get_composers(composers):
         name = re.sub('\(.*\)', "", composer).strip()
 
         born, died = None, None
-        match = re.search(year_regex, composer)
+
+        match = re.search(born_regex, composer)
         if match:
             born = match.group(0)
-            if len(match.groups()) > 1:
-                died = match.group(1)
+
+        match = re.search(died_regex, composer)
+        if match:
+            died = match.group(0)
 
         results.append(Person(name, born, died))
     return results
@@ -217,5 +220,7 @@ def process_print(lines):
 
 range_str = '(\S+)--(\S+)'
 range_regex = re.compile(range_str)
+born_regex = re.compile('\(\d\d\d\d--')
+died_regex = re.compile('--\d\d\d\d\)')
 year_regex = re.compile('\d\d\d\d')
 partiture_regex = re.compile('yes')
