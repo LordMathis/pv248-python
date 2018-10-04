@@ -1,3 +1,3 @@
-# pv248-python
+# [PV248] Python
 
-repository for python class at MUNI
+repository for python course at Masaryk University
