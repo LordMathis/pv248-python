@@ -3,12 +3,12 @@ from scorelib import Print, Edition, Composition, Voice, Person
 
 range_str = '(\S+)--(\S+)'
 range_regex = re.compile(range_str)
-born_regex = re.compile('\(\d\d\d\d--')
-died_regex = re.compile('--\d\d\d\d\)')
+born_regex = re.compile('\((\d\d\d\d)--')
+died_regex = re.compile('--(\d\d\d\d)\)')
 year_regex = re.compile('\d\d\d\d')
 partiture_regex = re.compile('yes')
 
-def get_composers(composers):
+def get_composers(composers, conn):
     composers = composers.split(';')
     results = []
 
@@ -19,13 +19,13 @@ def get_composers(composers):
 
         match = re.search(born_regex, composer)
         if match:
-            born = match.group(0)
+            born = match.group(1)
 
         match = re.search(died_regex, composer)
         if match:
-            died = match.group(0)
+            died = match.group(1)
 
-        results.append(Person(name, born, died))
+        results.append(Person(conn, name, born, died))
     return results
 
 def get_year(line):
@@ -34,7 +34,7 @@ def get_year(line):
         return match.group(0)
     return None
 
-def get_editors(line):
+def get_editors(line, conn):
     results = []
 
     editors = line.split(',')
@@ -47,7 +47,7 @@ def get_editors(line):
             names.append(editors[i] + ',' + editors[i+1])
 
     for name in names:
-        results.append(Person(name.strip()))
+        results.append(Person(conn, name.strip()))
 
     return results
 
@@ -63,7 +63,7 @@ def get_voice(line):
     return Voice(name.strip(), voice_range)
 
 
-def load(filename):
+def load(filename, conn):
     prints = []
     with open(filename, 'r') as ins:
         lines = []
@@ -72,12 +72,12 @@ def load(filename):
             if line:
                 lines.append(line)
             else:
-                new_print = process_print(lines)
+                new_print = process_print(lines, conn)
                 if new_print:
                     prints.append(new_print)
                 lines = []
 
-        new_print = process_print(lines)
+        new_print = process_print(lines, conn)
         if new_print:
             prints.append(new_print)
 
@@ -85,7 +85,7 @@ def load(filename):
     return prints
 
 
-def process_print(lines):
+def process_print(lines, conn):
 
     if not lines:
         return None
@@ -101,7 +101,7 @@ def process_print(lines):
             print_id = int(key_val[1].strip())
 
         elif key_val[0] == 'Composer':
-            authors = get_composers(key_val[1].strip())
+            authors = get_composers(key_val[1].strip(), conn)
 
         elif key_val[0] == 'Title':
             composition_name = key_val[1].strip()
@@ -132,7 +132,7 @@ def process_print(lines):
                 edition_name = None
 
         elif key_val[0] == 'Editor':
-            editors = get_editors(key_val[1].strip())
+            editors = get_editors(key_val[1].strip(), conn)
 
         elif 'Voice' in key_val[0]:
             voices.append(get_voice(key_val[1].strip()))

@@ -1,6 +1,7 @@
 from sys import argv
 import utils
 import sqlite3
+import traceback
 
 if __name__ == '__main__':
     input = argv[1]
@@ -14,6 +15,11 @@ if __name__ == '__main__':
         conn = sqlite3.connect(output)
         conn.executescript(script)
 
+        utils.load(input, conn)
 
-    except Exception as e:
-        print(e)
+        conn.commit()
+
+
+    except:
+        tb = traceback.format_exc()
+        print(tb)
