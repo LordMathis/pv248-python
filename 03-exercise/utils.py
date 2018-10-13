@@ -6,6 +6,7 @@ range_regex = re.compile(range_str)
 born_regex = re.compile('\((\d\d\d\d)--')
 died_regex = re.compile('--(\d\d\d\d)\)')
 year_regex = re.compile('\d\d\d\d')
+voice_regex = re.compile('\d+')
 partiture_regex = re.compile('yes')
 
 def get_composers(composers, conn):
@@ -25,7 +26,8 @@ def get_composers(composers, conn):
         if match:
             died = match.group(1)
 
-        results.append(Person(conn, name, born, died))
+        p = Person(name, born, died)
+        results.append(p.store(conn))
     return results
 
 def get_year(line):
@@ -47,11 +49,12 @@ def get_editors(line, conn):
             names.append(editors[i] + ',' + editors[i+1])
 
     for name in names:
-        results.append(Person(conn, name.strip()))
+        p = Person(name.strip())
+        results.append(p.store(conn))
 
     return results
 
-def get_voice(line):
+def get_voice(line, voice_num):
     match = re.search(range_regex, line)
     voice_range, name = None, None
     if match:
@@ -60,7 +63,7 @@ def get_voice(line):
     else:
         name = line
 
-    return Voice(name.strip(), voice_range)
+    return Voice(name.strip(), voice_range, voice_num)
 
 
 def load(filename, conn):
@@ -135,7 +138,11 @@ def process_print(lines, conn):
             editors = get_editors(key_val[1].strip(), conn)
 
         elif 'Voice' in key_val[0]:
-            voices.append(get_voice(key_val[1].strip()))
+            voice_num = 1
+            match = re.search(voice_regex, key_val[0])
+            if match:
+                voice_num = match.group(0)
+            voices.append(get_voice(key_val[1].strip(), voice_num))
 
         elif key_val[0] == 'Partiture':
             if 'yes' in key_val[1]:
@@ -148,5 +155,6 @@ def process_print(lines, conn):
                 incipit = None
 
     composition = Composition(composition_name, incipit, key, genre, year, voices, authors)
-    edition = Edition(composition, editors, edition_name)
-    return Print(edition, print_id, partiture)
+    composition.store(conn)
+    #edition = Edition(composition, editors, edition_name)
+    #return Print(edition, print_id, partiture)
