@@ -163,6 +163,11 @@ class Person:
         cur.execute("SELECT * FROM person WHERE name = (?)", (self.name,))
         row = cur.fetchall()
 
+        if 'Bach, Johann Sebastian' in self.name:
+            print(self.born, self.died, self.name)
+            print(row)
+            print('\n')
+
         if len(row) == 0:
             cur.execute("INSERT INTO person (name, born, died) VALUES (?, ?, ?)",
                          (self.name, self.born, self.died))
@@ -182,7 +187,7 @@ class Person:
                 new_died = self.died
 
             cur.execute("UPDATE person SET born = ?, died = ? WHERE id = ?",
-                        (born, died, id))
+                        (new_born, new_died, id))
             return id
 
         else:
