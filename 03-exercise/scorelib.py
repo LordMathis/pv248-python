@@ -1,7 +1,3 @@
-class DBItem:
-    def store(self):
-        raise NotImplementedError("Store method not implemented")
-
 class Print:
     def __init__(self, edition, print_id, partiture):
         self.edition = edition
@@ -10,6 +6,13 @@ class Print:
 
     def composition(self):
         return self.edition.composition
+
+    def store(self, conn, edition_id):
+        cur = conn.cursor()
+
+        partiture = 'Y' if self.partiture else 'N'
+        cur.execute('''INSERT INTO print (id, partiture, edition) VALUES (?, ?, ?)''',
+                    (self.print_id, partiture, edition_id))
 
 class Edition:
     def __init__(self, composition, authors, name):
@@ -28,6 +31,8 @@ class Edition:
             cur = conn.cursor()
             cur.execute('''INSERT INTO edition_author (edition, editor) VALUES (?, ?)''',
                         (edition_id, author_id))
+
+        return edition_id
 
 class Composition:
     def __init__(self, name, incipit, key, genre, year, voices, authors):
