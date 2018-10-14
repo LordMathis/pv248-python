@@ -17,6 +17,17 @@ class Edition:
         self.authors = authors
         self.name = name
 
+    def store(self, conn, score_id):
+        cur = conn.cursor()
+
+        cur.execute('''INSERT INTO edition (score, name, year) VALUES (?, ?, ?)''',
+                    (score_id, self.name, None))
+        edition_id = cur.lastrowid
+
+        for author_id in self.authors:
+            cur = conn.cursor()
+            cur.execute('''INSERT INTO edition_author (edition, editor) VALUES (?, ?)''',
+                        (edition_id, author_id))
 
 class Composition:
     def __init__(self, name, incipit, key, genre, year, voices, authors):
@@ -38,7 +49,71 @@ class Composition:
         for voice in self.voices:
             voice.store(conn, id)
 
+        for author_id in self.authors:
+
+            cur = conn.cursor()
+            cur.execute('''INSERT INTO score_author (score, composer) VALUES (?, ?)''',
+                        (id, author_id))
+
+
         return id
+
+    def check_voices(self, conn, rows):
+        for row in rows:
+            ref_id = row[0]
+
+            cur = conn.cursor()
+            cur.execute('''SELECT * FROM voice WHERE score = ?''', (ref_id,))
+            voices = cur.fetchall()
+
+            found_all = True
+            for voice in voices:
+                found = False
+                for self_voice in self.voices:
+                    if (voice[1] == self_voice.number and
+                       voice[3] == self_voice.range and
+                       voice[4] == self_voice.name):
+
+                       found = True
+                if not found:
+                    found_all = False
+                    break
+
+            if found_all:
+                return ref_id
+
+        return None
+
+    def check_authors(self, conn, rows):
+        for row in rows:
+            ref_id = row[0]
+
+            cur = conn.cursor()
+            cur.execute('''SELECT * FROM score_author WHERE score = ?''', (ref_id,))
+            score_authors = cur.fetchall()
+
+            found_all = True
+            for score_author in score_authors:
+                cur = conn.cursor()
+                cur.execute('''SELECT * FROM person WHERE id = ?''', (score_author[2]))
+                author = cur.fetchone()
+
+                found = False
+                for self_author in self.authors:
+                    if (author[1] == self_author.born and
+                        authors[2] == self_author.died and
+                        authors[3] == self_author.name) :
+
+                        found = True
+
+                if not found:
+                    found_all = False
+                    break
+
+            if found_all:
+                return ref_id
+
+        return None
 
     def store(self, conn):
         cur = conn.cursor()
@@ -51,30 +126,14 @@ class Composition:
             return self.do_store(conn)
 
         else:
-            for row in rows:
-                ref_id = row[0]
+            voice_id = self.check_voices(conn, rows)
+            author_id = self.check_authors(conn, rows)
 
-                cur = conn.cursor()
-                cur.execute('''SELECT * FROM voice WHERE score = ?''', (ref_id,))
-                voices = cur.fetchall()
+            if voice_id == author_id:
+                return voice_id
 
-                found_all = True
-                for voice in voices:
-                    found = False
-                    for self_voice in self.voices:
-                        if (voice[1] == self_voice.number and
-                           voice[3] == self_voice.range and
-                           voice[4] == self_voice.name):
-
-                           found = True
-                    if not found:
-                        found_all = False
-                        break
-
-                if found_all:
-                    return ref_id
-                else:
-                    return self.do_store(conn)
+            else:
+                self.do_store(conn)
 
 class Voice:
     def __init__(self, name, range, number):
@@ -86,7 +145,7 @@ class Voice:
         cur = conn.cursor()
 
         cur.execute("INSERT INTO voice (score, number, range, name) VALUES (?, ?, ?, ?)",
-                    (ref_id, self.number, self.name, self.range))
+                    (ref_id, self.number, self.range, self.name))
 
 class Person:
     def __init__(self, name, born=None, died=None):

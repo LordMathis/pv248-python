@@ -155,6 +155,7 @@ def process_print(lines, conn):
                 incipit = None
 
     composition = Composition(composition_name, incipit, key, genre, year, voices, authors)
-    composition.store(conn)
-    #edition = Edition(composition, editors, edition_name)
+    comp_id = composition.store(conn)
+    edition = Edition(composition, editors, edition_name)
+    edition.store(conn, comp_id)
     #return Print(edition, print_id, partiture)
