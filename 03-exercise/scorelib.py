@@ -172,7 +172,7 @@ class Person:
             cur.execute("INSERT INTO person (name, born, died) VALUES (?, ?, ?)",
                          (self.name, self.born, self.died))
             return cur.lastrowid
-        elif len(row) == 1:
+        else:
             id = row[0][0]
             born = row[0][1]
             died = row[0][2]
@@ -189,6 +189,3 @@ class Person:
             cur.execute("UPDATE person SET born = ?, died = ? WHERE id = ?",
                         (new_born, new_died, id))
             return id
-
-        else:
-            print("Excuse me, wtf?")
