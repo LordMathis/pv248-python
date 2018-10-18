@@ -159,6 +159,10 @@ class Person:
         self.died = died
 
     def store(self, conn):
+
+        if self.name == "":
+            return None
+
         cur = conn.cursor()
         cur.execute("SELECT * FROM person WHERE name = (?)", (self.name,))
         row = cur.fetchall()

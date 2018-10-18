@@ -27,7 +27,9 @@ def get_composers(composers, conn):
             died = match.group(1)
 
         p = Person(name, born, died)
-        results.append(p.store(conn))
+        id = p.store(conn)
+        if id:
+            results.append(id)
     return results
 
 def get_year(line):
@@ -50,7 +52,9 @@ def get_editors(line, conn):
 
     for name in names:
         p = Person(name.strip())
-        results.append(p.store(conn))
+        id = p.store(conn)
+        if id:
+            results.append(id)
 
     return results
 
