@@ -14,6 +14,7 @@ class Print:
         cur.execute('''INSERT INTO print (id, partiture, edition) VALUES (?, ?, ?)''',
                     (self.print_id, partiture, edition_id))
 
+
 class Edition:
     def __init__(self, composition, authors, name):
         self.composition = composition
@@ -34,6 +35,7 @@ class Edition:
 
         return edition_id
 
+
 class Composition:
     def __init__(self, name, incipit, key, genre, year, voices, authors):
         self.name = name
@@ -46,9 +48,9 @@ class Composition:
 
     def do_store(self, conn):
         cur = conn.cursor()
-        cur.execute('''INSERT INTO score (name, genre, key, incipit)
-                    VALUES (?, ?, ?, ?) ''',
-                    (self.name, self.genre, self.key, self.incipit))
+        cur.execute('''INSERT INTO score (name, genre, key, incipit, year)
+                    VALUES (?, ?, ?, ?, ?) ''',
+                    (self.name, self.genre, self.key, self.incipit, self.year))
         id = cur.lastrowid
 
         for voice in self.voices:
@@ -106,8 +108,8 @@ class Composition:
                 found = False
                 for self_author in self.authors:
                     if (author[1] == self_author.born and
-                        authors[2] == self_author.died and
-                        authors[3] == self_author.name) :
+                        author[2] == self_author.died and
+                        author[3] == self_author.name) :
 
                         found = True
 
@@ -125,8 +127,9 @@ class Composition:
 
         cur.execute('''SELECT * FROM score WHERE name = ?
                     AND genre = ? AND key = ? AND incipit = ?''',
-                    ((self.name, self.genre, self.key, self.incipit)))
+                    (self.name, self.genre, self.key, self.incipit))
         rows = cur.fetchall()
+
         if len(rows) == 0:
             return self.do_store(conn)
 
@@ -138,7 +141,8 @@ class Composition:
                 return voice_id
 
             else:
-                self.do_store(conn)
+                return self.do_store(conn)
+
 
 class Voice:
     def __init__(self, name, range, number):
