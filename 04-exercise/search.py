@@ -1,6 +1,7 @@
 from sys import argv
 import sqlite3
 import traceback
+import json
 
 db = '../03-exercise/scorelib.dat'
 
@@ -28,18 +29,37 @@ def get_voices(score_id, conn):
 
     cur.execute('''SELECT * FROM voice WHERE score = ?''', (score_id,))
 
-    return cur.fetchall()
+    voices = {}
+    for voice in cur.fetchall():
+        number = voice[1]
+        range = voice[3]
+        name = voice[4]
+        voices[number] = {
+            "range": range,
+            "name": name
+        }
+    return voices
 
 def get_edition(score_id, conn):
     cur = conn.cursor()
-    print(score_id)
 
-    cur.execute('''SELECT edition.id, edition.name, person.name FROM
+    cur.execute('''SELECT edition.id, edition.name,
+                   person.name, person.born, person.died FROM
                    edition NATURAL LEFT JOIN
                    (edition_author NATURAL JOIN person)
                    WHERE score = ?''', (score_id,))
 
-    return cur.fetchone()
+    rows = cur.fetchall()
+    edition_id = rows[0][0]
+    edition_name = rows[0][1]
+    editors = []
+    for editor in rows:
+        editors.append({
+            "name": editor[2],
+            "born": editor[3],
+            "died": editor[4]
+        })
+    return (edition_id, edition_name, editors)
 
 def get_print(edition_id, conn):
     cur = conn.cursor()
@@ -48,24 +68,46 @@ def get_print(edition_id, conn):
 
     return cur.fetchall()
 
+
 if __name__ == '__main__':
 
     name = '%' + argv[1] + '%'
 
     try:
         conn = sqlite3.connect(db)
-        print(get_composers(name, conn))
+
+        all_data = {}
 
         for composer_id, composer_name in get_composers(name, conn):
-            print()
-            print(composer_id, composer_name)
-            for score in get_scores(composer_id, conn):
-                print("Score:", score)
-                print("Voice:", get_voices(score[0], conn))
-                edition = get_edition(score[0], conn)
-                print("Edition:", edition)
-                print("Print:", get_print(edition[0], conn))
 
+            composer_data = []
+
+            for score in get_scores(composer_id, conn):
+
+                voices =  get_voices(score[0], conn)
+                edition_id, edition_name, editors = get_edition(score[0], conn)
+                print_data = get_print(edition_id, conn)
+
+                for print_item in print_data:
+
+                    print_object = {
+                        "Print number": print_item[0],
+                        "Title": score[1],
+                        "Genre": score[2],
+                        "Key": score[3],
+                        "Incipit": score[4],
+                        "Composition year": score[5],
+                        "Voices": voices,
+                        "Edition": edition_name,
+                        "Editors": editors,
+                        "Partiture": True if print_item[1] == 'Y' else False
+                    }
+
+                    composer_data.append(print_object)
+
+            all_data[composer_name] = composer_data
+
+        print(json.dumps(all_data, indent=4, sort_keys=False))
 
         conn.commit()
 
