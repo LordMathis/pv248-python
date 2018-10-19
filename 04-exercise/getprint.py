@@ -9,7 +9,8 @@ db = './scorelib.dat'
 def get_score_id(conn, print_id):
     cur = conn.cursor()
 
-    cur.execute('''SELECT edition.score FROM print NATURAL JOIN edition
+    cur.execute('''SELECT edition.score FROM print JOIN edition
+                   on print.edition = edition.id
                    WHERE print.id = ?''', (print_id,))
 
     return cur.fetchone()[0]
@@ -18,7 +19,8 @@ def get_score_id(conn, print_id):
 def get_composers(conn, score_id):
     cur = conn.cursor()
 
-    cur.execute('''SELECT person.* FROM person NATURAL JOIN score_author
+    cur.execute('''SELECT person.* FROM person JOIN score_author
+                   on person.id = score_author.composer
                    WHERE score_author.score = ?''', (score_id,))
 
     return cur.fetchall()
