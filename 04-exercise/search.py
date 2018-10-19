@@ -3,7 +3,7 @@ import sqlite3
 import traceback
 import json
 
-db = '../03-exercise/scorelib.dat'
+db = './scorelib.dat'
 
 
 def get_composers(search_string, conn):
