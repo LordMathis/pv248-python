@@ -84,12 +84,7 @@ def load(filename, conn):
                     prints.append(new_print)
                 lines = []
 
-        new_print = process_print(lines, conn)
-        if new_print:
-            prints.append(new_print)
-
-    prints.sort(key=lambda x: x.print_id)
-    return prints
+        process_print(lines, conn)
 
 
 def process_print(lines, conn):
@@ -151,7 +146,6 @@ def process_print(lines, conn):
         elif key_val[0] == 'Partiture':
             if 'yes' in key_val[1]:
                 partiture = True
-            partiture = False
 
         elif key_val[0] == 'Incipit':
             incipit = key_val[1].strip()

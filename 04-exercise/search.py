@@ -34,9 +34,17 @@ def get_edition(score_id, conn):
     cur = conn.cursor()
     print(score_id)
 
-    cur.execute('''SELECT edition.name, person.name FROM edition LEFT OUTER JOIN
+    cur.execute('''SELECT edition.id, edition.name, person.name FROM
+                   edition NATURAL LEFT JOIN
                    (edition_author NATURAL JOIN person)
                    WHERE score = ?''', (score_id,))
+
+    return cur.fetchone()
+
+def get_print(edition_id, conn):
+    cur = conn.cursor()
+
+    cur.execute('''SELECT * FROM print WHERE edition = ?''', (edition_id,))
 
     return cur.fetchall()
 
@@ -54,8 +62,9 @@ if __name__ == '__main__':
             for score in get_scores(composer_id, conn):
                 print("Score:", score)
                 print("Voice:", get_voices(score[0], conn))
-                print("Edition:", get_edition(score[0], conn))
-
+                edition = get_edition(score[0], conn)
+                print("Edition:", edition)
+                print("Print:", get_print(edition[0], conn))
 
 
         conn.commit()
