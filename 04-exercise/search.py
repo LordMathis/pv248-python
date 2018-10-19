@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
             all_data[composer_name] = composer_data
 
-        print(json.dumps(all_data, indent=4, sort_keys=False))
+        print(json.dumps(all_data, indent=4, sort_keys=False, ensure_ascii=False))
 
         conn.commit()
 
