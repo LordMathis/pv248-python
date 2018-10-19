@@ -1,36 +1,30 @@
 from sys import argv
 import sqlite3
 import traceback
+import json
 
 db = './scorelib.dat'
 
 
-def get_person_id(conn):
+def get_score_id(conn, print_id):
     cur = conn.cursor()
 
-    cur.execute('''SELECT edition_author.id FROM print NATURAL JOIN edition
-                   INNER JOIN edition_author
-                   on edition.id = edition_author.edition
-                   WHERE print.id = ?''', (print_num,))
+    cur.execute('''SELECT edition.score FROM print NATURAL JOIN edition
+                   WHERE print.id = ?''', (print_id,))
 
-    rows = cur.fetchall()
-    results = []
-
-    for row in rows:
-        results.append(row[0])
-
-    return results
+    return cur.fetchone()[0]
 
 
-def get_composer(conn, id):
+def get_composers(conn, score_id):
     cur = conn.cursor()
 
-    cur.execute('''SELECT * FROM person WHERE id = ?''', (id,))
-    return cur.fetchone()
+    cur.execute('''SELECT person.* FROM person NATURAL JOIN score_author
+                   WHERE score_author.score = ?''', (score_id,))
+
+    return cur.fetchall()
 
 
 def format_composer(composer):
-
     return {
         "name": composer[3],
         "born": composer[1],
@@ -45,17 +39,17 @@ if __name__ == '__main__':
     try:
         conn = sqlite3.connect(db)
 
-        composer_ids = get_person_id(conn)
-        composers = []
+        score_id = get_score_id(conn, print_num)
+        composers_data = []
 
-        for composer_id in composer_ids:
+        composers = get_composers(conn, score_id)
+        if composers:
+            for composer in composers:
+                composers_data.append(format_composer(composer))
 
-            composer = get_composer(conn, composer_id)
-            composers.append(format_composer(composer))
+        print(json.dumps(composers_data, indent=4, sort_keys=False, ensure_ascii=False))
 
         conn.commit()
-
-        print(composers)
 
 
     except:
