@@ -119,13 +119,13 @@ if __name__ == '__main__':
                 for print_item in print_data:
 
                     print_object = {
-                        "Print number": print_item[0],
+                        "Print Number": print_item[0],
                         "Composer": all_composers,
                         "Title": score[1],
                         "Genre": score[2],
                         "Key": score[3],
                         "Incipit": score[4],
-                        "Composition year": score[5],
+                        "Composition Year": score[5],
                         "Voices": voices,
                         "Edition": edition_name,
                         "Editor": editors,
