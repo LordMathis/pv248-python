@@ -6,7 +6,7 @@ import json
 db = './scorelib.dat'
 
 
-def get_composers(search_string, conn):
+def get_matching_composers(search_string, conn):
     cur = conn.cursor()
 
     cur.execute('''SELECT id, name FROM person WHERE name like ?''',
@@ -24,6 +24,25 @@ def get_scores(id, conn):
 
     return cur.fetchall()
 
+def get_all_composers(score_id, conn):
+    cur = conn.cursor()
+
+    cur.execute('''SELECT person.* FROM person JOIN score_author
+                   on score_author.composer = person.id
+                   WHERE score_author.score = ?''', (score_id,))
+
+    composers = cur.fetchall()
+
+    res = []
+    for composer in composers:
+        cp_born, cp_died, cp_name = composer[1:4]
+        if cp_name or cp_born or cp_died:
+            res.append({
+                "name": cp_name,
+                "born": cp_born,
+                "died": cp_died
+            })
+    return res
 
 def get_voices(score_id, conn):
     cur = conn.cursor()
@@ -84,20 +103,24 @@ if __name__ == '__main__':
 
         all_data = {}
 
-        for composer_id, composer_name in get_composers(name, conn):
+        for composer_id, composer_name in get_matching_composers(name, conn):
 
             composer_data = []
 
             for score in get_scores(composer_id, conn):
 
-                voices =  get_voices(score[0], conn)
-                edition_id, edition_name, editors = get_edition(score[0], conn)
+                score_id = score[0]
+
+                voices =  get_voices(score_id, conn)
+                edition_id, edition_name, editors = get_edition(score_id, conn)
                 print_data = get_print(edition_id, conn)
+                all_composers = get_all_composers(score_id, conn)
 
                 for print_item in print_data:
 
                     print_object = {
                         "Print number": print_item[0],
+                        "Composer": all_composers,
                         "Title": score[1],
                         "Genre": score[2],
                         "Key": score[3],
@@ -105,7 +128,7 @@ if __name__ == '__main__':
                         "Composition year": score[5],
                         "Voices": voices,
                         "Edition": edition_name,
-                        "Editors": editors,
+                        "Editor": editors,
                         "Partiture": True if print_item[1] == 'Y' else False
                     }
 
