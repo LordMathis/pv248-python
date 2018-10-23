@@ -18,7 +18,8 @@ def get_composers(search_string, conn):
 def get_scores(id, conn):
     cur = conn.cursor()
 
-    cur.execute('''SELECT score.* FROM score_author NATURAL JOIN score
+    cur.execute('''SELECT score.* FROM score_author JOIN score
+                   on score_author.score = score.id
                    WHERE score_author.composer = ?''', (id,))
 
     return cur.fetchall()
@@ -45,14 +46,17 @@ def get_edition(score_id, conn):
 
     cur.execute('''SELECT edition.id, edition.name,
                    person.name, person.born, person.died FROM
-                   edition NATURAL LEFT JOIN
-                   (edition_author NATURAL JOIN person)
+                   edition LEFT JOIN
+                   (edition_author JOIN person
+                   on edition_author.editor = person.id)
+                   on edition_author.edition = edition.id
                    WHERE score = ?''', (score_id,))
 
     rows = cur.fetchall()
     edition_id = rows[0][0]
     edition_name = rows[0][1]
     editors = []
+    if len(rows)
     for editor in rows:
         editors.append({
             "name": editor[2],
