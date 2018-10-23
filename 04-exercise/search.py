@@ -56,13 +56,15 @@ def get_edition(score_id, conn):
     edition_id = rows[0][0]
     edition_name = rows[0][1]
     editors = []
-    if len(rows)
+
     for editor in rows:
-        editors.append({
-            "name": editor[2],
-            "born": editor[3],
-            "died": editor[4]
-        })
+        ed_name, ed_born, ed_died = editor[2:5]
+        if ed_name or ed_born or ed_died:
+            editors.append({
+                "name": ed_name,
+                "born": ed_born,
+                "died": ed_died
+            })
     return (edition_id, edition_name, editors)
 
 def get_print(edition_id, conn):
