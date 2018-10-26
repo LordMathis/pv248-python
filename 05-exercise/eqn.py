@@ -67,7 +67,7 @@ def solve(matrix, vector, variables):
     for i in range(0, len(variables)):
         solution[variables[i]] = res[i]
 
-    print('Solution:', solution)
+    return solution
 
 
 if __name__ == '__main__':
@@ -87,7 +87,15 @@ if __name__ == '__main__':
 
     if num_sol == 0:
         print('no solution')
+
     elif num_sol == 1:
-        solve(matrix, vector, variables)
+        
+        solution = solve(matrix, vector, variables)
+        solution_string = "solution:"
+
+        for key, value in sorted(solution.items(), key=lambda x: x[0]):
+            solution_string += " " + str(key) + " = " + str(value) + ","
+        print(solution_string[:-1])
+
     else:
         print('solution space dimension:', num_sol)
