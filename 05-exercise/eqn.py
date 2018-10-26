@@ -1,4 +1,5 @@
 from sys import argv
+import numpy
 from numpy import linalg
 
 def parse_line(line):
@@ -27,8 +28,18 @@ def parse_line(line):
 
     return equation, variables
 
-def to_array(equations, variables):
-    pass
+def to_matrix(equations, variables):
+    matrix = []
+    for equation in equations:
+        matrix_row = []
+        for var in variables:
+            if equation[var]:
+                matrix_row.append(equation[var])
+            else:
+                matrix_row.append(0)
+        matrix_row.append(equation['result'])
+        matrix.append(matrix_row)
+    return numpy.array(matrix)
 
 if __name__ == '__main__':
 
@@ -42,5 +53,5 @@ if __name__ == '__main__':
             eq_system.append(equation)
             variables = list(set(vars + variables))
 
-
-    print(eq_system, variables)
+    matrix = to_matrix(eq_system, variables)
+    print(matrix)
