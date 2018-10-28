@@ -34,7 +34,7 @@ def to_matrix(equations, variables):
     for equation in equations:
         matrix_row = []
         for var in variables:
-            if equation[var]:
+            if var in equation:
                 matrix_row.append(equation[var])
             else:
                 matrix_row.append(0)
@@ -54,12 +54,12 @@ def frobein(matrix, vector):
     rank_b = linalg.matrix_rank(matrix)
 
     if rank_a != rank_b:
+        return -1
+
+    if rank_b == matrix.shape[1]:
         return 0
 
-    if rank_b == matrix.shape[0]:
-        return 1
-
-    return rank_b - matrix.shape[0]
+    return matrix.shape[1] - rank_b
 
 def solve(matrix, vector, variables):
     res = linalg.solve(matrix, vector)
@@ -85,11 +85,11 @@ if __name__ == '__main__':
     matrix, vector = to_matrix(eq_system, variables)
     num_sol = frobein(matrix, vector)
 
-    if num_sol == 0:
+    if num_sol == -1:
         print('no solution')
 
-    elif num_sol == 1:
-        
+    elif num_sol == 0:
+
         solution = solve(matrix, vector, variables)
         solution_string = "solution:"
 
