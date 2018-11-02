@@ -5,13 +5,21 @@ import wave, struct
 if __name__ == '__main__':
     input = argv[1]
 
-    waveFile = wave.open(input, 'r')
+    wave_file = wave.open(input, 'r')
 
-    length = waveFile.getnframes()
-    channels = waveFile.getnchannels()
-    framerate = waveFile.getframerate()
+    nframes = wave_file.getnframes()
+    nchannels = wave_file.getnchannels()
 
-    for i in range(0,length):
-        waveData = waveFile.readframes(1)
-        data = struct.unpack("<h", waveData)
-        print(int(data[0]))
+    sample_rate = wave_file.getframerate()
+    sample_width = wave_file.getsampwidth()
+
+    T = nframes / float(sample_rate)
+    read_frames = wave_file.readframes(nframes)
+
+    wave_file.close()
+
+    data = struct.unpack("%dh" %  nchannels*nframes, read_frames)
+    data_per_channel = [data[offset::nchannels] for offset in range(nchannels)]
+    data = [sum(x)/len(x) for x in zip(*data_per_channel)]
+
+    print(data)
