@@ -107,3 +107,5 @@ scorelib.dat
 
 .idea
 input.txt
+*.wav
+*.png
