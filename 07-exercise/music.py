@@ -22,7 +22,35 @@ def merge_peaks(peaks):
     merged_peaks.append((start, end, curr_peaks))
     return merged_peaks
 
-def frame_to_time():
+def get_peaks(data_avg, frate):
+    peaks = []
+
+    i = 0;
+
+    while (i + frate) <= len(data_avg):
+
+        chunk = data_avg[i:i+frate]
+        amps = np.abs(np.fft.rfft(chunk))
+        chunk_avg = np.mean(amps)
+
+        segment_peaks = []
+
+        for j in range(0, len(amps)):
+            if amps[j] >= (20 * chunk_avg):
+                segment_peaks.append(j)
+
+        top_peaks = np.sort(np.array(segment_peaks))[:3]
+
+        peaks.append((i, top_peaks))
+
+        i += int(frate / 10)
+
+    return peaks
+
+def frame_to_time(frame, frate):
+    return frame / frate
+
+def freq_to_pitch(freqs):
     pass
 
 
@@ -42,30 +70,14 @@ if __name__ == '__main__':
     data_per_channel = [data[offset::nchannels] for offset in range(nchannels)]
     data_avg = [sum(e)/len(e) for e in zip(*data_per_channel)]
 
-    peaks = []
-
-    i = 0;
-
-    while (i + frate) < len(data_avg):
-
-        chunk = data_avg[i:i+frate]
-        amps = np.abs(np.fft.rfft(chunk))
-        chunk_avg = np.mean(amps)
-
-        segment_peaks = []
-
-        for j in range(0, len(amps)):
-            if amps[j] >= (20 * chunk_avg):
-                segment_peaks.append(j)
-
-        top_peaks = np.sort(np.array(segment_peaks))[:3]
-
-        peaks.append((i, top_peaks))
-
-        i += int(frate / 10)
+    peaks = get_peaks(data_avg, frate)
 
     if len(peaks) > 0:
-        # print('low = {}, high = {}'.format(np.min(peaks), np.max(peaks)))
-        print(merge_peaks(peaks))
+        merged_peaks = merge_peaks(peaks)
+
+        for m_peak in merged_peaks:
+            print(frame_to_time(m_peak[0], frate),
+                  frame_to_time(m_peak[1], frate),
+                  m_peak[2])
     else:
         print('no peaks')
