@@ -2,7 +2,27 @@ from sys import argv
 import numpy as np
 import wave, struct, math
 
-def merge_peaks():
+def merge_peaks(peaks):
+
+    merged_peaks = []
+
+    start = peaks[0][0]
+    end = peaks[0][0]
+    curr_peaks = peaks[0][1]
+
+    for peak in peaks:
+        if np.array_equal(peak[1], curr_peaks):
+            end = peak[0]
+        else:
+            merged_peaks.append((start, end, curr_peaks))
+            start = peak[0]
+            end = peak[0]
+            curr_peaks = peak[1]
+
+    merged_peaks.append((start, end, curr_peaks))
+    return merged_peaks
+
+def frame_to_time():
     pass
 
 
@@ -46,6 +66,6 @@ if __name__ == '__main__':
 
     if len(peaks) > 0:
         # print('low = {}, high = {}'.format(np.min(peaks), np.max(peaks)))
-        print(peaks)
+        print(merge_peaks(peaks))
     else:
         print('no peaks')
