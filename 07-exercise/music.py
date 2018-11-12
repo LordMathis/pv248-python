@@ -2,6 +2,10 @@ from sys import argv
 import numpy as np
 import wave, struct, math
 
+step = 2 ** (1.0/12.0)
+base_tones = ['c', 'cis', 'd', 'es', 'e', 'f',
+              'fis', 'g', 'gis', 'a', 'bes', 'b']
+
 def merge_peaks(peaks, frate):
 
     merged_peaks = []
@@ -56,12 +60,31 @@ def get_peaks(data_avg, frate):
 def frame_to_time(frame, frate):
     return frame / frate
 
-def freq_to_pitch(freqs):
+def freq_to_pitch(freq):
     pass
+
+def get_octave(freq):
+
+    octave_start = base_freq * math.pow(2, -9/12)
+
+    if (freq >= octave_start) and (freq < 2*octave_start):
+        return 0
+    elif freq < octave_start:
+        i = -1
+        while freq < (octave_start * (2 ** i)):
+            i -= 1
+        return i
+    else:
+        i = 2
+        while freq >= (octave_start * (2 ** i)):
+            i += 1
+        return i-1
+
+
 
 def filter_cluster(amps, cluster_start, cluster_end):
     if cluster_end - cluster_start == 1:
-        return amps[cluster_start]
+        return cluster_start
 
     cluster_max = cluster_start
     cluster_center = cluster_start + ((cluster_end - cluster_start) // 2)
@@ -79,7 +102,9 @@ def filter_cluster(amps, cluster_start, cluster_end):
     return cluster_max
 
 if __name__ == '__main__':
-    fname = argv[1]
+
+    base_freq = float(argv[1])
+    fname = argv[2]
 
     with wave.open(fname, 'rb') as wav:
 
@@ -102,6 +127,8 @@ if __name__ == '__main__':
         for m_peak in merged_peaks:
             print(frame_to_time(m_peak[0], frate),
                   frame_to_time(m_peak[1], frate),
-                  m_peak[2])
+                  m_peak[2],
+                  get_octave(m_peak[2][0]),
+                  get_octave(m_peak[2][1]))
     else:
         print('no peaks')
