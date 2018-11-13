@@ -11,16 +11,23 @@ def merge_peaks(peaks, frate):
     merged_peaks = []
 
     start = peaks[0][0]
-    end = peaks[0][0]
+    end = peaks[1][0]
     curr_peaks = peaks[0][1]
 
-    for peak in peaks:
+    for i in range(len(peaks)):
+        peak = peaks[i]
+        next_peak = peak
+
+        if i+1 < len(peaks):
+            next_peak = peaks[i+1]
+
         if np.array_equal(peak[1], curr_peaks):
-            end = peak[0]
+            end = next_peak[0]
+
         else:
             merged_peaks.append((start, end, curr_peaks))
             start = peak[0]
-            end = peak[0]
+            end = next_peak[0]
             curr_peaks = peak[1]
 
     merged_peaks.append((start, end, curr_peaks))
@@ -60,9 +67,6 @@ def get_peaks(data_avg, frate):
 def frame_to_time(frame, frate):
     return frame / frate
 
-def freq_to_pitch(freq):
-    pass
-
 def get_octave_and_pitch(freq):
 
     octave_start = base_freq * math.pow(2, -9/12)
@@ -88,7 +92,11 @@ def get_octave_and_pitch(freq):
     for id in range(12):
 
         if freq >= curr_tone and freq < next_tone:
-            id, cents = compute_cents(curr_tone, next_tone, freq, id)
+            id, cents, octave_change = compute_cents(curr_tone, next_tone, freq, id)
+
+            if octave_change:
+                return (octave + 1, id, cents)
+
             return (octave, id, cents)
 
         curr_tone = next_tone
@@ -97,33 +105,38 @@ def get_octave_and_pitch(freq):
 
 def compute_cents(lower, higher, freq, id):
 
-    cent_step = (higher - lower) / 100
-    midpoint = lower + 50 * cent_step
+    cent_step = (higher - lower) / 100.0
+    midpoint = lower + (50 * cent_step)
 
     if abs(lower - freq) < (cent_step / 2):
-        return (id, None)
+        return (id, None, None)
 
-    cents = (midpoint - freq) / cent_step
-
-    if freq < midpoint:
-        return (id, cents)
+    if freq <= midpoint:
+        cents = (freq - lower) / cent_step
+        return (id, int(round(cents)), None)
     else:
-        return (id+1, -cents)
+        cents = (higher - freq) / cent_step
+        octave = None
+        if id + 1 > 11:
+            id = -1
+            octave = 1
+        return (id+1, int(round(cents)), octave)
 
 def pitch_to_string(octave, id, cents):
+
     pitch = base_tones[id]
 
-    if octave < 0:
+    if octave >= 0:
+        pitch += abs(octave + 1) * "'"
+    elif octave < -1:
         pitch = pitch[0].upper() + (pitch[1:] if len(pitch) >= 2 else "")
-        pitch += (abs(octave)-1) * ','
-    elif octave > 0:
-        pitch += abs(octave) * "'"
+        pitch += abs(octave + 2) * ','
 
     if cents:
         if cents > 0:
-            pitch += '+' + str(int(abs(round(cents))))
+            pitch += '+' + str(cents)
         elif cents < 0:
-            pitch += '-' + str(int(round(cents)))
+            pitch += '-' + str(abs(cents))
     else:
         pitch += '+0'
 
@@ -138,10 +151,10 @@ def filter_cluster(amps, cluster_start, cluster_end):
     center_dist = abs(cluster_max - cluster_center)
 
     for i in range(cluster_start+1, cluster_end):
-        if peak > amps[cluster_max]:
+        if amps[i] > amps[cluster_max]:
             cluster_max = i
             center_dist = abs(cluster_max - cluster_center)
-        elif peak == cluster_max:
+        elif amps[i] == amps[cluster_max]:
             if abs(i - cluster_center) < center_dist:
                 cluster_max = i
                 center_dist = abs(cluster_max - cluster_center)
@@ -169,7 +182,7 @@ if __name__ == '__main__':
     peaks = get_peaks(data_avg, frate)
 
     if len(peaks) > 0:
-        merged_peaks = sorted(merge_peaks(peaks, frate))
+        merged_peaks = merge_peaks(peaks, frate)
 
         for m_peak in merged_peaks:
             start_time = frame_to_time(m_peak[0], frate)
