@@ -63,24 +63,71 @@ def frame_to_time(frame, frate):
 def freq_to_pitch(freq):
     pass
 
-def get_octave(freq):
+def get_octave_and_pitch(freq):
 
     octave_start = base_freq * math.pow(2, -9/12)
 
     if (freq >= octave_start) and (freq < 2*octave_start):
-        return 0
+        octave = 0
     elif freq < octave_start:
         i = -1
         while freq < (octave_start * (2 ** i)):
             i -= 1
-        return i
+        octave = i
     else:
         i = 2
         while freq >= (octave_start * (2 ** i)):
             i += 1
-        return i-1
+        octave = i-1
+
+    octave_start *= math.pow(2, octave)
+
+    curr_tone = octave_start
+    next_tone = octave_start * step
+
+    for id in range(12):
+
+        if freq >= curr_tone and freq < next_tone:
+            id, cents = compute_cents(curr_tone, next_tone, freq, id)
+            return (octave, id, cents)
+
+        curr_tone = next_tone
+        next_tone *= step
 
 
+def compute_cents(lower, higher, freq, id):
+
+    cent_step = (higher - lower) / 100
+    midpoint = lower + 50 * cent_step
+
+    if abs(lower - freq) < (cent_step / 2):
+        return (id, None)
+
+    cents = (midpoint - freq) / cent_step
+
+    if freq < midpoint:
+        return (id, cents)
+    else:
+        return (id+1, -cents)
+
+def pitch_to_string(octave, id, cents):
+    pitch = base_tones[id]
+
+    if octave < 0:
+        pitch = pitch[0].upper() + (pitch[1:] if len(pitch) >= 2 else "")
+        pitch += (abs(octave)-1) * ','
+    elif octave > 0:
+        pitch += abs(octave) * "'"
+
+    if cents:
+        if cents > 0:
+            pitch += '+' + str(int(abs(round(cents))))
+        elif cents < 0:
+            pitch += '-' + str(int(round(cents)))
+    else:
+        pitch += '+0'
+
+    return pitch
 
 def filter_cluster(amps, cluster_start, cluster_end):
     if cluster_end - cluster_start == 1:
@@ -122,13 +169,18 @@ if __name__ == '__main__':
     peaks = get_peaks(data_avg, frate)
 
     if len(peaks) > 0:
-        merged_peaks = merge_peaks(peaks, frate)
+        merged_peaks = sorted(merge_peaks(peaks, frate))
 
         for m_peak in merged_peaks:
-            print(frame_to_time(m_peak[0], frate),
-                  frame_to_time(m_peak[1], frate),
-                  m_peak[2],
-                  get_octave(m_peak[2][0]),
-                  get_octave(m_peak[2][1]))
+            start_time = frame_to_time(m_peak[0], frate)
+            end_time = frame_to_time(m_peak[1], frate)
+
+            result = str(start_time) + '-' + str(end_time) + ' '
+
+            for peak in m_peak[2]:
+                result += pitch_to_string(*get_octave_and_pitch(peak)) + ' '
+
+            print(result)
+
     else:
         print('no peaks')
