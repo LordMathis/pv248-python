@@ -41,4 +41,4 @@ def print_json(data):
                      default=default))
 
 def read_data(fname):
-    return pd.read_csv(fname)
+    return pd.read_csv(fname, index_col=0)

@@ -1,8 +1,10 @@
 from sys import argv
 import pandas as pd
 import numpy as np
-import json
 import utils
+
+def get_student_data(id, data):
+    print(data.loc[id, : ])
 
 if __name__ == '__main__':
 
@@ -10,4 +12,10 @@ if __name__ == '__main__':
     id = argv[2]
 
     data = utils.read_data(fname)
-    print(data)
+    dates_dframe, ex_dframe = utils.make_dframes(data)
+
+    if id == 'average':
+        pass
+    else:
+        id = int(id)
+        get_student_data(id, data)

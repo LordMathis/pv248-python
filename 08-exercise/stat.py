@@ -2,9 +2,6 @@ from sys import argv
 import pandas as pd
 import utils
 
-def read_data(fname):
-    return pd.read_csv(fname)
-
 def proc_data(data):
 
     result = {}
