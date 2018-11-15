@@ -6,10 +6,33 @@ import json
 def read_data(fname):
     return pd.read_csv(fname)
 
-def proc_dates(data):
-    pass
+def make_dframes(data):
+    dates_dframe = pd.DataFrame()
+    ex_dframe = pd.DataFrame()
 
-def proc_deadlines(data):
+    for column in data.columns.values:
+
+        if column == 'student':
+            dates_dframe['student'] = data['student']
+            ex_dframe['student'] = data['student']
+            continue
+
+        column_split = column.split('/')
+
+        if column_split[0] in dates_dframe.columns:
+            dates_dframe[column_split[0]] += data[column]
+        else:
+            dates_dframe[column_split[0]] = data[column]
+
+        if column_split[1] in ex_dframe.columns:
+            ex_dframe[column_split[1]] += data[column]
+        else:
+            ex_dframe[column_split[1]] = data[column]
+
+
+    return dates_dframe, ex_dframe
+
+def proc_data(data):
 
     result = {}
 
@@ -54,13 +77,13 @@ if __name__ == '__main__':
     mode = argv[2]
 
     data = read_data(fname)
+    dates_dframe, ex_dframe = make_dframes(data)
 
     if mode == 'dates':
-        proc_dates(data)
+        print_json(proc_data(dates_dframe))
     elif mode == 'deadlines':
-        res = proc_deadlines(data)
-        print_json(res)
+        print_json(proc_data(data))
     elif mode == 'exercises':
-        proc_exercises(data)
+        print_json(proc_data(ex_dframe))
     else:
         print('Unknown mode')
