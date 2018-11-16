@@ -126,6 +126,7 @@ def compute_cents(lower, higher, freq, id):
         return (id, int(round(cents)), None)
     else:
         cents = (higher - freq) / cent_step
+        cents = -1 * cents
         octave = None
         if id + 1 > 11:
             id = -1
