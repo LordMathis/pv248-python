@@ -68,7 +68,7 @@ def get_peaks(data_avg, frate):
         else:
             top_peaks = list(segment_peaks.keys())
 
-        peaks.append(sorted(top_peaks))
+        peaks.append((i, sorted(top_peaks)))
 
         i += int(frate / 10)
 
