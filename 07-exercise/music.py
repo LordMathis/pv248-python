@@ -44,21 +44,31 @@ def get_peaks(data_avg, frate):
         amps = np.abs(np.fft.rfft(chunk))
         chunk_avg = np.mean(amps)
 
-        segment_peaks = []
+        segment_peaks = {}
         p_start = None
 
         for j in range(0, len(amps)):
             if amps[j] >= (20 * chunk_avg):
-                if p_start is None:
-                    p_start = j
+                segment_peaks[j] = amps[j]
 
-            elif p_start is not None:
-                segment_peaks.append(filter_cluster(amps, p_start, j))
-                p_start = None
+        top_peaks = []
 
-        top_peaks = np.sort(np.array(segment_peaks))[:3]
+        if len(segment_peaks) > 3:
 
-        peaks.append((i, top_peaks))
+            for _ in range(3):
+                max_peak_idx = sorted(segment_peaks.items(), key=lambda kv: kv[1], reverse=True)[0][0]
+                top_peaks.append(max_peak_idx)
+                del segment_peaks[max_peak_idx]
+                try:
+                    del segment_peaks[max_peak_idx - 1]
+                    del segment_peaks[max_peak_idx + 1]
+                except KeyError:
+                    pass
+
+        else:
+            top_peaks = list(segment_peaks.keys())
+
+        peaks.append(sorted(top_peaks))
 
         i += int(frate / 10)
 
