@@ -8,11 +8,6 @@ def make_dframes(data):
 
     for column in data.columns.values:
 
-        if column == 'student':
-            dates_dframe['student'] = data['student']
-            ex_dframe['student'] = data['student']
-            continue
-
         column_split = column.split('/')
 
         if column_split[0] in dates_dframe.columns:
@@ -30,8 +25,9 @@ def make_dframes(data):
 
 '''https://stackoverflow.com/a/50577730'''
 def default(o):
-    if isinstance(o, np.int64): return int(o)
-    raise TypeError
+    if isinstance(o, np.int64):
+        return int(o)
+    return str(o)
 
 def print_json(data):
     print(json.dumps(data,
