@@ -65,80 +65,81 @@ class Composition:
 
         return id
 
-    def check_voices(self, conn, rows):
-        for row in rows:
-            ref_id = row[0]
+    def check_voices(self, conn, ref_id):
 
-            cur = conn.cursor()
-            cur.execute('''SELECT * FROM voice WHERE score = ?''', (ref_id,))
-            voices = cur.fetchall()
+        cur = conn.cursor()
+        cur.execute('''SELECT * FROM voice WHERE score = ?''', (ref_id,))
+        voices = cur.fetchall()
 
-            found_all = True
-            for voice in voices:
-                found = False
-                for self_voice in self.voices:
-                    if (voice[1] == self_voice.number and
-                       voice[3] == self_voice.range and
-                       voice[4] == self_voice.name):
+        if len(voices) == 0 and len(self.voices) == 0:
+            return True
 
-                       found = True
-                if not found:
-                    found_all = False
-                    break
+        found_all = True
+        for voice in voices:
+            found = False
+            for self_voice in self.voices:
+                if (voice[1] == self_voice.number and
+                   voice[3] == self_voice.range and
+                   voice[4] == self_voice.name):
 
-            if found_all:
-                return ref_id
+                   found = True
+            if not found:
+                found_all = False
+                break
 
-        return None
+        return found_all
 
     def check_authors(self, conn, rows):
         for row in rows:
             ref_id = row[0]
 
             cur = conn.cursor()
-            cur.execute('''SELECT * FROM score_author WHERE score = ?''', (ref_id,))
-            score_authors = cur.fetchall()
+            cur.execute('''SELECT composer FROM score_author WHERE score = ?''', (ref_id,))
+            score_authors = sorted([x[0] for x in cur.fetchall()])
 
-            found_all = True
-            for score_author in score_authors:
-                cur = conn.cursor()
-                cur.execute('''SELECT * FROM person WHERE id = ?''', (score_author[2]))
-                author = cur.fetchone()
+            if len(score_authors) != len(self.authors):
+                continue
 
-                found = False
-                for self_author in self.authors:
-                    if (author[1] == self_author.born and
-                        author[2] == self_author.died and
-                        author[3] == self_author.name) :
+            self_authors = sorted(self.authors)
+            found = True
 
-                        found = True
-
-                if not found:
-                    found_all = False
+            for i in range(len(self_authors)):
+                if self_authors[i] != score_authors[i]:
+                    found = False
                     break
 
-            if found_all:
+            if found:
                 return ref_id
 
-        return None
+        return False
 
     def store(self, conn):
         cur = conn.cursor()
 
-        cur.execute('''SELECT * FROM score WHERE name = ?
-                    AND genre = ? AND key = ? AND incipit = ?''',
-                    (self.name, self.genre, self.key, self.incipit))
+        query = "SELECT * FROM score WHERE name = ?"
+        values = [self.name]
+
+        if self.genre is not None:
+            query += "AND genre = ?"
+            values.append(self.genre)
+        if self.key is not None:
+            query += "AND key = ?"
+            values.append(self.key)
+        if self.incipit is not None:
+            query += "AND incipit = ?"
+            values.append(self.incipit)
+
+        cur.execute(query,tuple(values))
         rows = cur.fetchall()
 
         if len(rows) == 0:
             return self.do_store(conn)
 
         else:
-            voice_id = self.check_voices(conn, rows)
             author_id = self.check_authors(conn, rows)
 
-            if voice_id == author_id:
-                return voice_id
+            if self.check_voices(conn, author_id):
+                return author_id
 
             else:
                 return self.do_store(conn)
