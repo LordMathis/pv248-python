@@ -40,8 +40,8 @@ def process_student(stud_dates, stud_exs):
         date_16 = 'inf'
         date_20 = 'inf'
     else:
-        day_16 = math.ceil(16 / a[0])
-        day_20 = math.ceil(20 / a[0])
+        day_16 = int(16 / a[0])
+        day_20 = int(20 / a[0])
 
         date_16 = date_to_string(add_days(day_16))
         date_20 = date_to_string(add_days(day_20))
