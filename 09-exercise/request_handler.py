@@ -16,16 +16,18 @@ def make_forward_handler(upstream_url):
             res_json = {}
 
             req = Request('http://' + upstream_url + self.path)
+
             for key in self.headers:
-                if key == 'Host' and upstream_url not in self.headers[key]:
-                    req.add_header(key, upstream_url)
-                else:
-                    req.add_header(key, self.headers[key])
+                req.add_header(key, self.headers[key])
 
             try:
                 res = urlopen(req, timeout=1)
-            except (HTTPError, URLError) as error:
-                print(e)
+            except HTTPError as http_error:
+                res_json['code'] = http_error.code
+                res_json['headers'] = dict(http_error.headers)
+            except URLError as url_error:
+                print(url_error)
+                raise
             except timeout:
                 res_json['code'] = 'timeout'
             else:
@@ -40,16 +42,16 @@ def make_forward_handler(upstream_url):
                 else:
                     res_json['json'] = res_data_json
 
-                res_content = bytes(json.dumps(res_json,
-                                               indent=4,
-                                               sort_keys=False,
-                                               ensure_ascii=False), 'utf-8')
+            res_content = bytes(json.dumps(res_json,
+                                           indent=4,
+                                           sort_keys=False,
+                                           ensure_ascii=False), 'utf-8')
 
-                self.send_response(200, 'OK')
-                self.send_header('Connection', 'close')
-                self.send_header('Content-Type', 'text/json; charset=utf-8')
-                self.end_headers()
-                self.wfile.write(res_content)
+            self.send_response(200, 'OK')
+            self.send_header('Connection', 'close')
+            self.send_header('Content-Type', 'text/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(res_content)
 
         def do_POST(self):
 
@@ -79,8 +81,12 @@ def make_forward_handler(upstream_url):
 
                     try:
                         res = urlopen(request, timeout=req_timeout)
-                    except (HTTPError, URLError) as error:
-                        print(e)
+                    except HTTPError as http_error:
+                        res_json['code'] = http_error.code
+                        res_json['headers'] = dict(http_error.headers)
+                    except URLError as url_error:
+                        print(url_error)
+                        raise
                     except timeout:
                         res_json['code'] = 'timeout'
                     else:
