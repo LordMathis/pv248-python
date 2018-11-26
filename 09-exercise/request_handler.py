@@ -1,6 +1,7 @@
 import os
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from socket import timeout
@@ -16,8 +17,6 @@ def make_forward_handler(upstream_url):
             res_json = {}
 
             req = Request(upstream_url + self.path)
-
-            print(req.full_url, req.type)
 
             for key in self.headers:
                 req.add_header(key, self.headers[key])
@@ -72,9 +71,16 @@ def make_forward_handler(upstream_url):
                     res_json['code'] = 'invalid json'
                 else:
                     if req['type'] == 'POST':
+
+                        headers = req['headers']
+                        headers['Accept-Encoding'] = 'identity'                        
+
+                        data = urlencode(req['content']).encode('utf-8')
+
                         request = Request(req['url'],
-                                          data=req['content'],
-                                          headers=req['headers'])
+                                          data=data,
+                                          headers=headers)
+
                     else:
                         request = Request(req['url'],
                                           headers=req['headers'])
