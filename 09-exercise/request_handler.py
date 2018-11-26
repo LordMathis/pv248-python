@@ -15,7 +15,9 @@ def make_forward_handler(upstream_url):
 
             res_json = {}
 
-            req = Request('http://' + upstream_url + self.path)
+            req = Request(upstream_url + self.path)
+
+            print(req.full_url, req.type)
 
             for key in self.headers:
                 req.add_header(key, self.headers[key])
