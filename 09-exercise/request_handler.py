@@ -34,6 +34,7 @@ def make_forward_handler(upstream_url):
             else:
                 res_json['code'] = res.getcode()
                 res_json['headers'] = dict(res.getheaders())
+
                 res_data = res.read()
 
                 try:
@@ -57,7 +58,7 @@ def make_forward_handler(upstream_url):
         def do_POST(self):
 
             req_content_legth = int(self.headers['Content-Length'])
-            req_body = self.rfile.read(req_content_legth)
+            req_body = self.rfile.read(req_content_legth).decode('utf-8')
             res_json = {}
 
             try:
@@ -73,7 +74,7 @@ def make_forward_handler(upstream_url):
                     if req['type'] == 'POST':
 
                         headers = req['headers']
-                        headers['Accept-Encoding'] = 'identity'                        
+                        headers['Accept-Encoding'] = 'identity'
 
                         data = urlencode(req['content']).encode('utf-8')
 
