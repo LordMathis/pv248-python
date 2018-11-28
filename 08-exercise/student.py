@@ -53,7 +53,7 @@ def process_student(stud_dates, stud_exs):
         'passed': stud_exs.astype(bool).sum(),
         'regression slope': abs(a[0]),
         'date 16': date_16,
-        'date_20': date_20
+        'date 20': date_20
     }
 
     return res
