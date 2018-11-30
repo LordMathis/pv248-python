@@ -1,10 +1,11 @@
 import os
 import json
+import ssl
+import socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
-from socket import timeout
 
 def make_forward_handler(upstream_url):
     class ForwardHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -26,7 +27,7 @@ def make_forward_handler(upstream_url):
             except URLError as url_error:
                 print(url_error)
                 raise
-            except timeout:
+            except socket.timeout:
                 res_json['code'] = 'timeout'
             else:
                 res_json['code'] = res.getcode()
