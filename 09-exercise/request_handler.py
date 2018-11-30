@@ -12,14 +12,14 @@ def make_forward_handler(upstream_url):
         def __init__(self, *args, **kwargs):
             super(ForwardHTTPRequestHandler, self).__init__(*args, **kwargs)
 
-        def send_request(url, headers, data=None, timeout=1):
+        def send_request(self, url, headers, data=None, timeout=1):
 
             res_json = {}
 
-            req = Request(url, headers=headers, data=data, timeout=timeout)
+            req = Request(url, headers=headers, data=data)
 
             try:
-                res = urlopen(req, timeout=1)
+                res = urlopen(req, timeout=timeout)
             except HTTPError as http_error:
                 res_json['code'] = http_error.code
                 res_json['headers'] = dict(http_error.headers)
@@ -50,7 +50,7 @@ def make_forward_handler(upstream_url):
             for key in self.headers:
                 headers[key] = self.headers[key]
 
-            res_json = send_request(url, headers)
+            res_json = self.send_request(url, headers)
 
             res_content = bytes(json.dumps(res_json,
                                            indent=4,
@@ -92,7 +92,7 @@ def make_forward_handler(upstream_url):
 
                     req_timeout = int(req['timeout']) if req['timeout'] else 1
 
-                    res_json = send_request(req['url'], headers, data, req_timeout)
+                    res_json = self.send_request(req['url'], headers, data, req_timeout)
 
             res_content = bytes(json.dumps(res_json,
                                            indent=4,
