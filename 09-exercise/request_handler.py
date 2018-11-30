@@ -12,14 +12,11 @@ def make_forward_handler(upstream_url):
         def __init__(self, *args, **kwargs):
             super(ForwardHTTPRequestHandler, self).__init__(*args, **kwargs)
 
-        def do_GET(self):
+        def send_request(url, headers, data=None, timeout=1):
 
             res_json = {}
 
-            req = Request(upstream_url + self.path)
-
-            for key in self.headers:
-                req.add_header(key, self.headers[key])
+            req = Request(url, headers=headers, data=data, timeout=timeout)
 
             try:
                 res = urlopen(req, timeout=1)
@@ -43,6 +40,17 @@ def make_forward_handler(upstream_url):
                     res_json['content'] = str(res_data)
                 else:
                     res_json['json'] = res_data_json
+
+            return res_json
+
+        def do_GET(self):
+
+            url = upstream_url + self.path
+            headers = {}
+            for key in self.headers:
+                headers[key] = self.headers[key]
+
+            res_json = send_request(url, headers)
 
             res_content = bytes(json.dumps(res_json,
                                            indent=4,
@@ -78,37 +86,13 @@ def make_forward_handler(upstream_url):
 
                         data = urlencode(req['content']).encode('utf-8')
 
-                        request = Request(req['url'],
-                                          data=data,
-                                          headers=headers)
-
                     else:
-                        request = Request(req['url'],
-                                          headers=req['headers'])
+
+                        headers = req['headers']
 
                     req_timeout = int(req['timeout']) if req['timeout'] else 1
 
-                    try:
-                        res = urlopen(request, timeout=req_timeout)
-                    except HTTPError as http_error:
-                        res_json['code'] = http_error.code
-                        res_json['headers'] = dict(http_error.headers)
-                    except URLError as url_error:
-                        print(url_error)
-                        raise
-                    except timeout:
-                        res_json['code'] = 'timeout'
-                    else:
-                        res_json['code'] = res.getcode()
-                        res_json['headers'] = dict(res.getheaders())
-                        res_data = res.read()
-
-                        try:
-                            res_data_json = json.loads(res_data)
-                        except:
-                            res_json['content'] = str(res_data)
-                        else:
-                            res_json['json'] = res_data_json
+                    res_json = send_request(req['url'], headers, data, req_timeout)
 
             res_content = bytes(json.dumps(res_json,
                                            indent=4,
