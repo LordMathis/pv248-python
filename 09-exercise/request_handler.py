@@ -1,6 +1,5 @@
 import os
 import json
-import ssl
 import socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
