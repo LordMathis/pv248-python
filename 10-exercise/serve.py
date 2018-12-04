@@ -9,7 +9,7 @@ def make_cgi_handler(port, dir):
 
     class Handler(CGIHTTPRequestHandler):
 
-        cgi_directories = [os.path.join(__file__, dir)]
+        cgi_directories = [os.path.normpath(os.path.join(os.getcwd(), dir))]
 
         def send_file(self, file_path):
             with open(file_path, 'rb') as f:
@@ -25,14 +25,18 @@ def make_cgi_handler(port, dir):
 
         def run(self, path, params):
             print('running cgi script')
-            self.cgi_info = dir, path + '?' + params
+            print(path)
+            self.cgi_info = os.path.relpath(dir), path + '?' + params
             self.run_cgi()
+
+        def get_path(self, path):
+            return os.path.normpath(os.path.join(os.getcwd(), dir, path))
 
         def do_GET(self):
 
             parsed_url = urllib.parse.urlparse(self.path)
             req_params = parsed_url.query
-            req_path = os.path.join(__file__, dir, parsed_url.path[1:])
+            req_path = self.get_path(parsed_url.path[1:])
 
             print(req_path)
 
@@ -50,7 +54,7 @@ def make_cgi_handler(port, dir):
 
             parsed_url = urllib.parse.urlparse(self.path)
             req_params = parsed_url.query
-            req_path = os.path.join(__file__, dir, parsed_url.path[1:])
+            req_path = self.get_path(parsed_url.path[1:])
 
             if os.path.isfile(req_path):
                 if req_path.endswith('.cgi'):
