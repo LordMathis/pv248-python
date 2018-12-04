@@ -6,10 +6,27 @@ from http.server import HTTPServer
 from http.server import CGIHTTPRequestHandler
 
 def make_cgi_handler(port, dir):
+
     class Handler(CGIHTTPRequestHandler):
 
+        cgi_directories = [os.path.join(__file__, dir)]
+
         def send_file(self, file_path):
-            pass
+            with open(file_path, 'rb') as f:
+                size = os.path.getsize(file_path)
+
+                data = f.read()
+
+                self.send_response(200)
+                self.send_header('Content-Length', str(size))
+                self.end_headers()
+                self.wfile.write(data)
+
+
+        def run(self, path, params):
+            print('running cgi script')
+            self.cgi_info = dir, path + '?' + params
+            self.run_cgi()
 
         def do_GET(self):
 
@@ -17,29 +34,31 @@ def make_cgi_handler(port, dir):
             req_params = parsed_url.query
             req_path = os.path.join(__file__, dir, parsed_url.path[1:])
 
+            print(req_path)
+
             if os.path.isfile(req_path):
                 if req_path.endswith('.cgi'):
-                    self.cgi_info = dir, parsed_url.path[1:] + '?' + req_params
-                    self.run_cgi()
+                    self.run(parsed_url.path[1:], req_params)
                 else:
-                    with open(req_path) as file:
-                        self.send_file(req_path)
+                    self.send_file(req_path)
             else:
-                self.send_error(404, 'Not Found')
+                self.send_error(403, 'Forbidden')
 
         def do_POST(self):
             req_content_legth = int(self.headers['Content-Length'])
             req_body = self.rfile.read(req_content_legth).decode('utf-8')
 
+            parsed_url = urllib.parse.urlparse(self.path)
+            req_params = parsed_url.query
+            req_path = os.path.join(__file__, dir, parsed_url.path[1:])
+
             if os.path.isfile(req_path):
                 if req_path.endswith('.cgi'):
-                    self.cgi_info = dir, parsed_url.path[1:] + '?' + req_params
-                    self.run_cgi()
+                    self.run(parsed_url.path[1:], req_params)
                 else:
-                    with open(req_path) as file:
-                        self.send_file(req_path)
+                    self.send_file(req_path)
             else:
-                self.send_error(404, 'Not Found')
+                self.send_error(403, 'Forbidden')
 
     return Handler
 
