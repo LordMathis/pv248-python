@@ -12,11 +12,11 @@ def make_forward_handler(upstream_url):
         def __init__(self, *args, **kwargs):
             super(ForwardHTTPRequestHandler, self).__init__(*args, **kwargs)
 
-        def send_request(self, url, headers, data=None, timeout=1):
+        def send_request(self, url, headers, data=None, timeout=1, method='GET'):
 
             res_json = {}
 
-            req = Request(url, headers=headers, data=data)
+            req = Request(url, headers=headers, data=data, method=method)
 
             try:
                 res = urlopen(req, timeout=timeout)
@@ -74,25 +74,24 @@ def make_forward_handler(upstream_url):
             except:
                 res_json['code'] = 'invalid json'
             else:
+                type = req['type'] if 'type' in req else 'GET'
+
                 if (req['url'] is None or
-                    (req['type'] == 'POST' and
+                    (type == 'POST' and
                      req['content'] is None)):
                     res_json['code'] = 'invalid json'
+
                 else:
-                    if req['type'] == 'POST':
+                    headers = req['headers'] if 'headers' in req else {}
 
-                        headers = req['headers']
+                    if type == 'POST':
+
                         headers['Accept-Encoding'] = 'identity'
-
                         data = urlencode(req['content']).encode('utf-8')
 
-                    else:
-
-                        headers = req['headers']
 
                     req_timeout = int(req['timeout']) if req['timeout'] else 1
-
-                    res_json = self.send_request(req['url'], headers, data, req_timeout)
+                    res_json = self.send_request(req['url'], headers, data, req_timeout, type)
 
             res_content = bytes(json.dumps(res_json,
                                            indent=4,
