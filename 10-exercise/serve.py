@@ -38,8 +38,6 @@ def make_cgi_handler(port, dir):
             req_params = parsed_url.query
             req_path = self.get_path(parsed_url.path[1:])
 
-            print(req_path)
-
             if os.path.isfile(req_path):
                 if req_path.endswith('.cgi'):
                     self.run(parsed_url.path[1:], req_params)
