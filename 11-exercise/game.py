@@ -7,6 +7,7 @@ class Game():
         self.next = 1
         self.name = name
         self.status = None
+        self.full = False
 
     def status(self):
         return self.status
@@ -15,7 +16,9 @@ class Game():
 
         if self.next == player:
 
-            if self.board[x][y] == 0:
+            if x < 0 or x > 2 or y < 0 or y > 2:
+                return 'bad", "x:{}, y:{} is outside board range'.format(x, y)
+            elif self.board[x][y] == 0:
                 self.board[x][y] = player
                 self.next = 1 if player == 2 else 2
                 if self._check_victory(x, y):

@@ -30,13 +30,29 @@ class TicTacToeHandler(BaseHTTPRequestHandler):
 
             game = Game(name)
             games[max_id] = game
+            res_json['status'] = 'ok'
+            res_json['message'] = 'ok'
             res_json['id'] = max_id
 
             max_id += 1
 
         else:
 
-            if 'game' not in req_params:
+            if req_path == 'list':
+                game_list = []
+
+                for game_id in games:
+                    game = games[game_id]
+
+                    if not game.full:
+                        game_list.append({
+                            'id': game_id,
+                            'name': game.name
+                        });
+
+                res_json['games'] = game_list
+
+            elif 'game' not in req_params:
 
                 self.send_error(400, 'Bad Request')
 
@@ -52,8 +68,10 @@ class TicTacToeHandler(BaseHTTPRequestHandler):
 
                 if game.status is None:
                     res_json['board'] = game.board
+                    res_json['full'] = game.full
                     res_json['next'] = game.next
                 else:
+                    res_json['board'] = game.board
                     res_json['winner'] = game.status
 
             elif req_path == 'play':
@@ -68,6 +86,26 @@ class TicTacToeHandler(BaseHTTPRequestHandler):
 
                 res_json['status'] = status
                 res_json['message'] = message
+                res_json['board'] = game.board
+
+            elif req_path == 'join':
+
+                game_id = int(req_params['game'][0])
+
+                if games[game_id].full:
+                    res_json['status'] = 'bad'
+                    res_json['message'] = 'Game with id {} is already full'.format(game_id)
+
+                else:
+                    games[game_id].full = True
+                    res_json = {
+                        'status': 'ok',
+                        'message': 'ok',
+                        'id': game_id
+                    }
+
+            else:
+                self.send_error(404, 'Not Found')
 
         res_content = bytes(json.dumps(res_json,
                                        indent=4,
