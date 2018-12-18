@@ -50,8 +50,12 @@ def play_game(url, game_id, player):
             print_board(res['board'])
             print('Your turn ({})'.format('x' if player == 1 else 'o'))
 
-            user_input = stdin.readline().rstrip('\n')
-            x, y = tuple(user_input.split()[:2])
+            user_input = stdin.readline().rstrip('\n').strip()
+            if len(user_input.split()) != 2:
+                print("Invalid input")
+                continue
+
+            x, y = tuple(user_input.split())
 
             query = {
                 'game': game_id,
@@ -100,11 +104,17 @@ if __name__ == '__main__':
         game_list = send_request(url, 'list', {})
 
         game_ids = []
-        for game in game_list['games']:
-            print('{} - {}'.format(game['id'], game['name']))
-            game_ids.append(int(game['id']))
 
-        print('Type game id to join or "new game_name" to start new game')
+        if len(game_list['games']) > 0:
+            print('Available games:')
+            for game in game_list['games']:
+                print('{} {}'.format(game['id'], game['name']))
+                game_ids.append(int(game['id']))
+                print('Type game id to join or "new game_name" to start new game')
+
+        else:
+            print('There are no game available on the server. Type "new game_name" to start new game')
+
         user_input = stdin.readline().rstrip('\n')
 
         if user_input.startswith('new'):
