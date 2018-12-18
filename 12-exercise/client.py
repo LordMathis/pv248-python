@@ -40,7 +40,10 @@ def play_game(url, game_id, player):
 
         if 'winner' in res:
             print_board(res['board'])
-            print('Player {} wins'.format(res['winner']))
+            if res['winner'] == 0:
+                print("It's a draw!")
+            else:
+                print('Player {} wins'.format(res['winner']))
             return
 
         elif full and res['next'] == player:
@@ -63,6 +66,7 @@ def play_game(url, game_id, player):
                 print(play_res['message'])
             else:
                 print_board(play_res['board'])
+                print("Waiting for other player...")
 
         else:
             sleep(1)
@@ -71,18 +75,13 @@ def play_game(url, game_id, player):
 
 def print_board(board):
 
-    symbols = [' ', 'X', 'O']
+    symbols = ['_', 'X', 'O']
 
     for i, row in enumerate(board):
-        row_str = str(i) + ' '
+        row_str = ''
         for cell in row:
-            row_str += '| ' + symbols[cell] + ' '
+            row_str += symbols[cell]
         print(row_str)
-    print('--------------')
-    print('  | 0 | 1 | 2 ')
-
-    return
-
 
 
 if __name__ == '__main__':
@@ -105,7 +104,7 @@ if __name__ == '__main__':
             print('{} - {}'.format(game['id'], game['name']))
             game_ids.append(int(game['id']))
 
-        print('Type game id to join or "new" to start new game')
+        print('Type game id to join or "new game_name" to start new game')
         user_input = stdin.readline().rstrip('\n')
 
         if user_input.startswith('new'):
