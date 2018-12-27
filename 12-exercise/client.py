@@ -41,18 +41,21 @@ def play_game(url, game_id, player):
         if 'winner' in res:
             print_board(res['board'])
             if res['winner'] == 0:
-                print("It's a draw!")
+                print("draw")
             else:
-                print('Player {} wins'.format(res['winner']))
+                if res['winner'] == player:
+                    print('you win')
+                else:
+                    print('you lose')
             return
 
         elif full and res['next'] == player:
             print_board(res['board'])
-            print('Your turn ({})'.format('x' if player == 1 else 'o'))
+            print('your turn ({})'.format('x' if player == 1 else 'o'))
 
             user_input = stdin.readline().rstrip('\n').strip()
             if len(user_input.split()) != 2:
-                print("Invalid input")
+                print("invalid input")
                 continue
 
             x, y = tuple(user_input.split())
@@ -70,7 +73,7 @@ def play_game(url, game_id, player):
                 print(play_res['message'])
             else:
                 print_board(play_res['board'])
-                print("Waiting for other player...")
+                print("waiting for other player")
 
         else:
             sleep(1)
