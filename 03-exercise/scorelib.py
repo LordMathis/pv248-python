@@ -71,6 +71,9 @@ class Composition:
         cur.execute('''SELECT * FROM voice WHERE score = ?''', (ref_id,))
         voices = cur.fetchall()
 
+        if len(voices) != len(self.voices):
+            return False
+
         if len(voices) == 0 and len(self.voices) == 0:
             return True
 
@@ -140,7 +143,6 @@ class Composition:
 
             if self.check_voices(conn, author_id):
                 return author_id
-
             else:
                 return self.do_store(conn)
 

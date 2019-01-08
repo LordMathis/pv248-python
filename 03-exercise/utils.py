@@ -144,7 +144,7 @@ def process_print(lines, conn):
             match = re.search(voice_regex, key_val[0])
             if match:
                 voice_num = match.group(0)
-            new_voice = get_voice(key_val[1].strip(), voice_num)
+            new_voice = get_voice(key_val[1].strip(), int(voice_num))
             if new_voice:
                 voices.append(new_voice)
 
