@@ -83,6 +83,7 @@ def make_forward_handler(upstream_url):
 
                 else:
                     headers = req['headers'] if 'headers' in req else {}
+                    data = {}
 
                     if type == 'POST':
 
