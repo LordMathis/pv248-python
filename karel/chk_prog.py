@@ -15,7 +15,7 @@ def process_procedure(procedures, key, file):
         simple_inst = ['SKIP', 'BREAK', 'HALT', 'MOVE', 'LEFT', 'RIGHT', 'PICKUP', 'PUTDOWN']
         
         if line in simple_inst:
-            instructions.append(line)
+            instructions.append((k+i, line))
             
         elif line.startswith('IFWALL') or line.startswith('IFMARK'):
             
@@ -25,7 +25,7 @@ def process_procedure(procedures, key, file):
                 return None
                 
             if split[1] in simple_inst:
-                instructions.append((split[0], split[1]))
+                instructions.append((k+i, split[0], split[1]))
             else:
                 
                 if not split[1].isalnum():
@@ -36,10 +36,10 @@ def process_procedure(procedures, key, file):
                     utils.report(file, k+i, "Undefined reference")
                     return None
                     
-                instructions.append((split[0], split[1]))
+                instructions.append((k+i, split[0], split[1]))
         
         elif line.startswith('ELSE'):
-            if isinstance(instructions[-1], tuple):
+            if instructions[-1][0] in ['IFWALL', 'IFMARK']:
                 
                 split = line.split()
                 if len(split) != 2:
@@ -61,7 +61,7 @@ def process_procedure(procedures, key, file):
                 utils.report(file, k+i, "Undefined reference")
                 return None
             
-            instructions.append(line)
+            instructions.append((k+i, line))
                 
     return instructions     
         
