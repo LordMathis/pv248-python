@@ -109,3 +109,5 @@ scorelib.dat
 input.txt
 *.wav
 *.png
+
+test_data/

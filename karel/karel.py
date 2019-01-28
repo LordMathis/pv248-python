@@ -1,6 +1,3 @@
-
-
-
 class WorldMap:
 
     def __init__(self,
@@ -18,3 +15,8 @@ class WorldMap:
         self.dir = dir
         self.map = map
         
+class Program:
+    
+    def __init__(self, program):
+        
+        self.program = program

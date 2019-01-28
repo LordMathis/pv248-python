@@ -78,6 +78,8 @@ def check_world(world_file):
                 utils.report(world_file, i+3, "Unexpected character")
                 return None
 
+            if char == ' ':
+                char = 0
             world_line.append(char)
 
         world.append(world_line)
@@ -87,7 +89,7 @@ def check_world(world_file):
             return None
 
     if len(world) < height:
-        utils.report(world_file, len(world_data), "Unexpected number of lines")
+        utils.report(world_file, len(world_data)+1, "Unexpected number of lines")
         return None
 
     return WorldMap(width, height, pos_x, pos_y, dir, world)
