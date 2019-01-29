@@ -1,5 +1,4 @@
 from sys import argv, exit
-from karel import WorldMap
 import utils
 
 def check_position(pos_x, pos_y, width, height, dir, file):
@@ -92,6 +91,7 @@ def check_world(world_file):
         utils.report(world_file, len(world_data)+1, "Unexpected number of lines")
         return None
 
+    from karel import WorldMap
     return WorldMap(width, height, pos_x, pos_y, dir, world)
 
 if __name__ == '__main__':

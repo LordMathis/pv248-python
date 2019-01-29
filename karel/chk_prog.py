@@ -1,14 +1,13 @@
 from sys import argv, exit
 import utils
-from karel import Program
 
 def process_procedure(procedures, key, file):
     
     procedure, k = procedures[key]
     instructions = []
-            
+                
     for i, line in enumerate(procedure):
-        
+                
         if line.startswith('#') or len(line) == 0:
             continue
         
@@ -39,7 +38,7 @@ def process_procedure(procedures, key, file):
                 instructions.append((k+i, split[0], split[1]))
         
         elif line.startswith('ELSE'):
-            if instructions[-1][0] in ['IFWALL', 'IFMARK']:
+            if instructions[-1][1] in ['IFWALL', 'IFMARK']:
                 
                 split = line.split()
                 if len(split) != 2:
@@ -132,7 +131,7 @@ def check_prog(file):
         utils.report(file, i+1, 'MAIN method not found')
         return None
         
-    print(procedures)
+    from karel import Program
     return Program(procedures)
     
 
