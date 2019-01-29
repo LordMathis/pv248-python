@@ -1,4 +1,10 @@
-review od 456673 *0.5 review mi pomohlo hlavne čo sa týka názvov premenných
+review od 456673 *0.5 
+
+- Dobré review, ktoré poukázalo na to čo robím dobre a v čom by som sa mal zlepšiť. 
+- Review mi pomohlo hlavne čo sa týka názvov premenných.
+- Taktiež si dobudúcna určite nastavím automatický formátovač a linter. 
+
+Review:
 
 Úkol 02:
 
