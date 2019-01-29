@@ -1,0 +1,35 @@
+review od 456673 *0.5 review mi pomohlo hlavne čo sa týka názvov premenných
+
+Úkol 02:
+
+scorelib.py
+- nelíbí se mi název proměnné 'comp', to ušetřejí pár znaků ničemu nepomuže, spíše uškodí. já mám osobně rád ukecané, popisné názvy proměnných
+- sčítání řetězců mi osobně připadá dosti nepřehledné, preferuju string format (případně f-string pokud není třeba komplexní formátování řetězce)
+- nepoužíval bych zastaralý formátovač řetězců (oprátor modulo), spíše string format nebo f-string. Používat operátor modulo na řetězce je hřích
+- chybí ti mezery kolem matematických operátorů, což jde proti stylu pep8
+- nekonzistentní množstí mezer mezi funkcemi... toto by napravil formátovač
+- jinak kód je pěkný a pěkně dělěný na malé celky (i když ta process_print už je celkem na hraně)
+
+
+Úkol 07:
+
+music.py
+- konstany se dle konvencí pojmenovávají pomocí ALL CAPS, případně jako prevence nechtěnného přepsaní je možné uložit je do třídy, která je vrací skrze getter
+- mezery kolem operátorů opět chybí
+- nelíbí se mit pojmenování některých proměnných... třeba mi nneí na první pohled jasné, co obsahuje taková proměnná frate. Kdyby byla lépe pojmenována, tak si to nemusím dohledávat, a kód by se četl lépe. Tady konrétně je to i trochu matoucí, když člověk vidí proměnnou frame a frate :)
+- celkově bych asi nezkracoval slova v názvech proměnných, já mám osobně rád ukecané názvy proměnných, z mých zkušeností můžu říct, že to hodně napomáhá čitelnosti kódu (ale zase se to nesmí přehánět, třeba jako v Javě :)
+- jeden řádek je zakončený středníkem; to se v pythonu nedělá :)
+- v kódu se ti vyskytují nepoužité proměnné
+- chválím rozdělení kódu na mal funkce, to se často v tomto předmětu nevidí :)
+
+
+Úkol 12:
+
+client.py
+- prázdné řádky v kódu jsou super věc, kód se tím pěkně provzduění a je ho pomocí newlines rozdělit na "věty", nekonzistentní používání prázdných řádků však dělá kód nepřehledný, navíc v případě této úlohy v kombinaci se slovníky tu a tam kód nevypadá vůbec hezky
+- zakomentovaný kód do kódu nepatří :)
+- main funkce je příliš dlouhá a nepřehledná, rozdělil bych ji na menší funkce
+- až na to formátování tu není tedy moc co vytknout, kód je psaný jednoduše a čte se celkem pěkně (až na ty mezery...)
+
+jinak obecně:
+- je dobré mít funkční formátovač a linter, a formátování provádět buď ručně, nebo třeba nastavit automatické spouštění při commitování (a linter jde například taky podobně nastavit, že blokuje commit dokud neopravíš chyby v kódu)
