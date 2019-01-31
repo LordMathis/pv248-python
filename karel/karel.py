@@ -35,11 +35,7 @@ class WorldMap:
         
     def set_position(self, x, y, z):
         self._map[y][x] = z
-        
-    def print_world(self):
-        for row in self._map:
-            print(''.join(str(row)))
-        
+                
         
 class Program:
     
@@ -60,6 +56,14 @@ class Karel:
         self._pos_x = worldmap._init_pos_x
         self._pos_y = worldmap._init_pos_y
         self._dir = worldmap._init_dir
+        
+    def print_world(self):
+        print('{} {}'.format(self._worldmap._width, self._worldmap._height))
+        print('{} {} {}'.format(self._pos_x, self._pos_y, self._dir))
+        for row in self._worldmap._map:
+            for item in row:
+                print(item, end='')
+            print()
                 
     def run(self):
         
@@ -80,7 +84,7 @@ class Karel:
         if ret != 0:
             return None
         
-        self._worldmap.print_world()
+        self.print_world()
         utils.eprint("program finished in {} steps".format(self._steps))          
         return ret
         
@@ -92,10 +96,7 @@ class Karel:
             self._stack.append(instruction)    
         
     def _run_instruction(self, instruction):
-        
-        print(self._steps, instruction)
-        self._worldmap.print_world()
-        
+                
         if instruction[1] == '__sub__':
             return 0
         

@@ -99,9 +99,7 @@ def check_prog(file):
             
             line = lines[i].strip()
             while i < len(lines) and line != 'END':
-                
-                print("\"" + line.strip() + "\"", line == 'END')
-                
+                                
                 if line.startswith('DEFINE'):
                     utils.report(file, i+1, "Missing END")
                     return None
