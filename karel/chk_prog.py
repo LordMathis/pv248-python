@@ -97,16 +97,18 @@ def check_prog(file):
             i += 1
             k = i
             
-            while i < len(lines) and lines[i] != 'END':
+            line = lines[i].strip()
+            while i < len(lines) and line != 'END':
                 
-                line = lines[i]
+                print("\"" + line.strip() + "\"", line == 'END')
                 
                 if line.startswith('DEFINE'):
                     utils.report(file, i+1, "Missing END")
                     return None
                                                 
-                procedure.append(line.strip())
+                procedure.append(line)
                 i += 1
+                line = lines[i].strip()
                 
             if i == len(lines):
                 utils.report(file, i+1, "Missing END")

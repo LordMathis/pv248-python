@@ -21,9 +21,7 @@ class WorldMap:
         self._map = map
         
     def check_position(self, x, y):
-        
-        print(x, y)
-        
+                        
         if x < 0 or x >= self._width:
             return -1
             
@@ -96,6 +94,7 @@ class Karel:
     def _run_instruction(self, instruction):
         
         print(self._steps, instruction)
+        self._worldmap.print_world()
         
         if instruction[1] == '__sub__':
             return 0
@@ -133,8 +132,10 @@ class Karel:
                 self._pos_x = next_pos_x
                 self._pos_y = next_pos_y
                 
+            else:
                 utils.report(prog_file, instruction[0],
                              "Runtime Error: Karel tried to move into a wall") 
+                return -1
             
         elif instruction[1] == 'LEFT':
             cur_dir = self._dir
@@ -212,14 +213,14 @@ class Karel:
                 
             if self._worldmap.check_position(next_pos_x, next_pos_y) == -1:
                 return self._run_instruction((instruction[0], instruction[2]))
-            else:
+            elif len(instruction) == 4:
                 return self._run_instruction((instruction[0] + 1, instruction[3]))
             
         elif instruction[1] == 'IFMARK':
             
             if self._worldmap.check_position(self._pos_x, self._pos_y) > 0:
                 return self._run_instruction((instruction[0], instruction[2]))
-            else:
+            elif len(instruction) == 4:
                 return self._run_instruction((instruction[0] + 1, instruction[3]))
             
         else:
