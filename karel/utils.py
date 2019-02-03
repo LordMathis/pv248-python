@@ -8,4 +8,4 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 def report(file, line, desc):
-    eprint('{}:{}:{}'.format(file, line, desc))
+    eprint('{}:{}: {}'.format(file, line, desc))

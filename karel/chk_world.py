@@ -30,11 +30,11 @@ def check_world_dims(width, height, file):
         width = int(width)
         height = int(height)
     except:
-        utils.report(file, 2, "World dimensions should be integers")
+        utils.report(file, 1, "World dimensions should be integers")
         return None, None
         
-    if width < 0 or height < 0:
-        utils.report(file, 2, "World dimensions cannot be negative")
+    if width <= 0 or height <= 0:
+        utils.report(file, 1, "World dimensions cannot be less than 0")
         return None, None
         
     return width, height
@@ -42,24 +42,36 @@ def check_world_dims(width, height, file):
 def check_world(world_file):
 
     world_data = utils.read_file(world_file).splitlines()
+    
+    if len(world_data) < 1:
+        utils.report(world_file, 1, "Unexpected number of lines")
+        return None
 
     if len(world_data[0].split()) != 2:
         utils.report(world_file, 1, "Line 1 should contain only width and height")
+        return None
+        
+    width, height = world_data[0].split()
+    width, height = check_world_dims(width, height, world_file)
+    if width is None or height is None:
+        return None 
+        
+    if len(world_data) < 2:
+        utils.report(world_file, 2, "Unexpected number of lines")
         return None
 
     if len(world_data[1].split()) != 3:
         utils.report(world_file, 2, "Line 2 should contain 3 items")
         return None
-
-    width, height = world_data[0].split()
-    width, height = check_world_dims(width, height, world_file)
-    if width is None or height is None:
-        return None 
     
     pos_x, pos_y, dir = world_data[1].split()    
     pos_x, pos_y, dir = check_position(pos_x, pos_y, width, height, dir, world_file)
     
     if pos_x is None or pos_y is None or dir is None:
+        return None
+        
+    if len(world_data) < 3:
+        utils.report(world_file, 3, "Unexpected number of lines")
         return None
     
     world = []
