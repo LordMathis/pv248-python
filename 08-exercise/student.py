@@ -28,6 +28,8 @@ def calc_avg(data):
     return data.mean(axis=0)
 
 def process_student(stud_dates, stud_exs):
+    
+    stud_dates = stud_dates.sort_index()
 
     cum_pts = stud_dates.cumsum()
     cum_pts = cum_pts.rename(lambda x: date_to_day(x))
