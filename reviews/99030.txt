@@ -1,0 +1,83 @@
+review od 99030 *0.5
+
+- Podrobné a prínosné review, dozvedel som sa niekoľko vecí, ktoré mi ušli a pomôžu sprehľadniť môj kód
+- Uvedomil som si napríklad to, že je dobré kontrolovať správnosť vstupných argumentov
+- Je tiež vhodné si často používané literály uložiť do konštanty aby to bolo prehľadnejšie a jednoduchšie na prípadnú úpravu 
+
+##########################
+# Úloha: 01-stat.py      #
+##########################
+
+*Řádek 66 je delší než 80 znaků. Délka každého řádku zdrojového textu programu
+ by se měla vejít do 80 znaků.
+*Líbí se mi implementace funkce year_to_century. Je krátká, čitelná a 
+ hlavně korektní. Rok 1831 je století 19. To má každý správně, ale 
+ pozor, rok 1800 ještě 19. století není (je posledním rokem 18. století).
+*Líbí se mi používání proměnných (či konstant) pro řetězcové literály a 
+ regulární výrazy (regexy), zpřehledňuje to kód, zabraňuje chybám a umožňuje
+ to rychlou a bezpečnou úpravu kódu. (já to tak nemám)
+*Funkce a proměnné jsou dobře pojmenované, hned je patrné o co jde.
+*Chválím použití funkce main (sám jsem ji dosud nepoužíval).
+*Program nemá žádné globální proměnné a to je dobře
+
+***
+results = [r for r in results if r is not None]
+
+Toto mi přijde trochu nepřehledné. Chvíli jsem bádal, co to dělá.
+Možná je to krátké a přehledné pro zkušeného pythonistu, ale 
+roznodně ne pro začátečníka.
+***
+
+Testování:
+*Chybí ošetření vstupních argumentů programu. Program vyžaduje dva argumenty.
+ Prvním z nich je jméno souboru se vstupními daty a druhým je volba 
+ (century nebo composer). Toto se sice netestuje, ale je to slušnost.
+*Program korektně vypisuje na stdout pro volbu century i pro volbu composer
+
+##########################
+# Úloha: 05-eqn.py       #
+##########################
+***
+Funkce parse_line parsuje vstupní řádek s rovnicí po znacích/tokenech a v
+závislosti na typu znaku, dělá příslušnou akci. Proměnné rovnice si ukládá v
+seznamu variables, koeficienty příslušných proměnných a výsledek rovnice 
+('result' je klíčem) ve slovníku equation. Je to bez použití regulárních
+výrazů. Nejsem si jist korektností, protože program později padá
+například pro vstup:
+
+2x + y = 5
+2x + 3y = 7
+
+ve funkci to_matrix(equations, variables)
+na řádku 41 
+vec.append(equation['result'])
+s chybovou zprávou: KeyError: 'result'
+***
+
+*Řetězcoví literál 'result' je v textu použit vícekrát, proto by bylo vhodné
+ ho definovat pomocí proměnné jako konstantu. Zpřehledňuje to kód, zabraňuje
+ chybám a umožňuje to rychlou a bezpečnou úpravu kódu. V první úloze jsou
+ takto literály definovány, v této úloze již ne.
+*Ke štábní kultůře zdrojového textu nemám výhrady. Funkce i proměnné jsou
+ dobře pojmenované, logicky ucelené časti kódu oddělené prázdným řádkem.
+*Program nemá žádné globální proměnné - OK.
+
+Testování:
+*Taky chybí ošetření vstupních argumentů programu. Program vyžaduje jeden
+ argument - jméno souboru se systémem rovnic.
+*V programu jsou chyby a padá prakticky pro jakýkoliv vstup.
+
+##########################
+# Úloha: 06-peaks.py     #
+##########################
+
+*Program je natolik krátký, že neobsahuje žádné funkce, vše je v rámci
+ if __name__ == '__main__': (kromě proměnné time) a nepředstavuje to problém z
+ hlediska čitelnosti programu
+*Proměnná time je mimo if __name__ == '__main__', kde je veškerý kód programu
+ a je tedy globální. Přestože to z hlediska funkčnosti nepředstavuje žádný
+ problém, stejně bych ji umístil ke zbytku kódu, ke které logicky patří.
+
+Testování:
+*Chybí ošetření vstupních argumentů programu.
+*Zdrojový text programu má pouze 41 řádků a funguje správně.
