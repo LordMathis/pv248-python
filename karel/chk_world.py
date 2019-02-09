@@ -79,6 +79,7 @@ def check_world(world_file):
     for i, line in enumerate(world_data[2:]):
 
         world_line = []
+        print(i, height)
 
         if len(line) != width:
             utils.report(world_file, i+3, "Unexpected number of items in line")
@@ -95,8 +96,8 @@ def check_world(world_file):
 
         world.append(world_line)
 
-        if i > height:
-            utils.report(world_file, i+2, "Unexpected number of lines")
+        if i >= height:
+            utils.report(world_file, i+3, "Unexpected number of lines")
             return None
 
     if len(world) < height:
@@ -104,6 +105,7 @@ def check_world(world_file):
         return None
 
     from karel import WorldMap
+    print(world)
     return WorldMap(width, height, pos_x, pos_y, dir, world)
 
 if __name__ == '__main__':
