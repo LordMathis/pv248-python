@@ -1,6 +1,7 @@
 review od 99030 *0.5
 
 - veľmi podrobné review, dozvedel som sa kde mám chyby, prípadne ako ich opraviť
+- taktiež som sa dozvedel niektoré časté chyby, ktorých by som sa mal vyvarovať
 
 
 ##########################
