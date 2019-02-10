@@ -1,0 +1,132 @@
+review od 99030 *0.5
+
+- veľmi podrobné review, dozvedel som sa kde mám chyby, prípadne ako ich opraviť
+
+
+##########################
+# Úloha: 02-test.py      #
+##########################
+*Jedná se o jednoduchý testovací skript pro testování knihovny scorelib.py
+*V programu chybí ověření vstupního argumentu programu, který zadává uživatel při jeho spuštění. 
+ Program vyžaduje vstupní soubor. Je dobrým zvykem informovat uživatele o tom, že při 
+ spuštění programu zadal menší počet argumentů a třeba vypsat nápovědu o použití programu.
+
+Testování knihovny scorelib.py:
+*Výstup programu neodděluje jednotlivé záznamy o skladbě prázdným řádkem.
+*Při opětovném načtení výstupu programu není jeho další výstup konzistentní s původním výstupem.
+ Tedy není splněna vlastnost idempotence, která se testuje.
+
+***
+  Chyba při výpisu u voice. Příklad vstupního souboru:
+  	Voice 1: g-d3, violin,  part
+        Voice 2: C2-c, cello, part 
+        Voice 3: c-e3, cis
+
+  Výstup programu je:
+        Voice 0: g-d3, violin,  part
+        Voice 1: C2-c, cello, part
+        Voice 2: c-e3, cis
+
+  *Tedy číslování Voice by nemělo začínat od nuly, ale od jedničky
+
+  Výstup programu u print number 41:
+
+  	Voice 1: oboe d1--bes2,
+  	Voice 1: continuo, numbered bass
+  
+  *Tady číslování Voice nefunguje vůbec a navíc je prohozena část name a range.
+
+***
+ 
+*Testovací skript odhalil, že knihovna scorelib.py obsahuje velké množství chyb a není funkční.
+
+
+##########################
+# Úloha: 02-scorelib.py  #
+##########################
+
+***
+  Nalezena chyba při výpisu Voice v metodě format ve třídě Print:
+  	
+  	for i, voice in enumerate(comp.voices):
+            if voice.range:
+                print("Voice %d: %s %s" % (i+1, voice.name, voice.range))
+            else:
+                print("Voice %d: %s" % (i, voice.name))
+
+  Správně by mělo být:
+  	
+	for i, voice in enumerate(comp.voices):
+            if voice.range:
+                print("Voice %d: %s %s" % (i+1, voice.range, voice.name))
+            else:
+                print("Voice %d: %s" % (i+1, voice.name))
+
+  Tedy prohodit voice.range a voice.name u print ve větvi if
+  a nezapomenout připočíst jedničku k proměnné i u print ve větvi else.
+
+***
+
+*V programu je metoda format jenom ve třídě Print. Dalším velice rozumným řešením by
+ bylo metodu format rozdělit, respektive mít definovanou metodu format u každé třídy,
+ u které to má smysl a pak jenom delegovat (volat v metodě format třídy Print metodu format
+ na příslušnou podřízenou třídu).
+*V programu jsou řádky, které jsou delší než 80 znaků. Je doporučeno mít na každém řádku 
+ nejvýše 80 znaků.
+*Dalším dobrým programátoským zvykem je mít v programu komentáře, které pomáhají kód programu
+ snadněji a rychleji pochopit. To šetří čas dalším programátorům a i autorovi programu, pokud
+ se k němu vrátí po delší době.
+*Program je dobře členěný na třídy a funkce. Líbí se mi konzistentní pojmenování funkcí, 
+ proměnné jsou pojmenované tak, aby z nich bylo možné snadno odvodit, k čemu slouží.
+*Je dobře, že v progamu není mnoho globálních proměnných. V programu jsou globální pouze některé 
+ proměnné s regulárními výrazy.
+ 	
+        
+##########################
+# Úloha: 11-ttt.py       #
+##########################
+
+*Líbí se mi, že je implementace rozdělena na serverovou část (v souboru ttt.py), která
+ se stará o komunikaci s klientským programem (client.py) a na 
+ herní část (v souboru game.py je třída Game), která se stará o změnu stavu hry jako je 
+ kontrola přípustného tahu, provádění a záznam hry, změnu hráče (který hráč je na tahu) a kontrolu ukončení hry.
+*Stejně jako u předchozí úlohy, některé řádky jsou delší než 80 znaků.
+*Opět chybí ověření zda užívatel při spuštění programu zadal povinný argument programu (číslo portu).
+*V programu jsou dvě globální proměnné. Lepší by bylo z nich udělat atributy nějaké třídy.
+
+        
+##########################
+# Úloha: 11-game.py      #
+##########################
+*Imlementace herní časti v samostatném souboru je dobrý nápad.
+*Chválím, že logicky související části kódu jsou odděleny prázdným řádkem, zvyšuje
+ to čitelnost programu.
+
+***
+  if x == y and self.board[0][0] == self.board[1][1] == self.board[2][2]:
+            return True
+  
+  *Je lepší explicitně závorkovat, zlepšuje to čitelnost programu.
+
+  if (x == y) and (self.board[0][0] == self.board[1][1] == self.board[2][2]):
+            return True
+
+***
+
+##########################
+# Úloha: 12-client.py    #
+##########################
+
+*Kód v bloku name == '__main__' je příliš dlouhý a nepřehledný. Vytvořil bych z něho víc funkcí.
+*Mám raději, když jsou funkce kratší, jsou pak mnohem přehlednější.
+*I v této úloze není ověřeno, zda uživatel zadal při spuštění programu vstupní argumenty programu (host a port).
+*Některé řádky kódu jsou delší než 80 znaků.
+*Líbí se mi, že importuješ mnoho modulů a nepíšeš si všechno sám.
+
+Testování:
+*Program není zatím plně funkční a není tedy co testovat.
+
+
+
+
+
