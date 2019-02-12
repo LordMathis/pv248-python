@@ -1,0 +1,46 @@
+review od 422570 *0.5
+
+- užitočné review, z ktorého som sa dozvedel, čo robím dobre a v čom sa mám zlepšiť
+- mal by som napríklad komentovať svoj kód, lepšie pracovať s konštantami
+- taktiež by som mal častejšie deliť kód na menšie funkcie
+
+Uloha 4.
+    getprint.py- Skript je vdaka dobrej uprave lahko citatelny a pochopitelny.
+                 Paci sa mi zachytavanie a vypisovanie vynimiek format_exc().
+                 Myslim, ze nie je potrebne robit commit na konci skriptu kedze neboli vykonane ziadne zmeny v databazy.
+                 Skript pracuje podla ocakavani. Na vystup posiela korektne data.
+
+    search.py- V podstate mam k nemu rovnake poznamky ako k predoslemu skriptu.
+               Aj v tomto pripade su predavane na vystup korektne vysledky.
+Uloha 8.
+    student.py- Kod je velmi dobre strukturovany a lahko citatelny.
+                Metody su vo vacsine kratke a ich nazvy vystihuju ich funkciu, takze je lahke pochopit co robia.
+                Po funkcnej stranke vyzera byt v podiraku.
+
+    stat.py- Skript je kratky a uprava kodu je velmi dobra.
+             Vystup je vhodne formatovany a vysledky vyzeraju byt korektne.
+
+    utils.py- Vyborne riesenie proti zbytocnej duplicite kodu.
+              Metody su kratke a je jasne co je ich funkciou.
+              Jedinu vyhradu mam k otvaraniu suboru v metode read_data(). Nie je bezpecne citat zo suboru takymto sposobom.
+
+Uloha 12. ttt.py- K funkcionalite nemam vyhrady. Server funguje ako podla ocakavani.
+                  Metoda do_Get je celkom dlha, bolo by lepsie ju rozdelit na viac mensich metod. Sprehladnil by sa tak kod.
+                  Aj napriek tomu je kod prehladne napisany a da sa z neho vyvodit co robi (ale aspon komentare by nezaskodili).
+                  Pri opakovanom pouzivani rovnakych retazcov by som zvazil pouzitie konstant. Vyhol by si sa pripadnym preklepom.
+
+          client.py- Aj tu by som zvazil vytvorenie konstant pre opakujuce sa retazce aby si sa vyvaroval preklepom.
+                     Zaroven by sa aj v tomto skripte hodilo rozdelenie vacsich metod do viacerych mensich, pomohlo by to citatelnosti kodu.
+                     Kod je ale napriek tomu dobre napisany a aj bez komentarov sa da vyvodit jeho funkcionalita.
+                     Bolo by vhodne po testovani odstranit zbytocne komentare pre vypisovanie medzivysledkov.
+                     Hru som vyskusal a vyzera to tak, ze funguje ako ma.
+                     Paci sa mi, ze po konci hry neukoncis klienta ale spytas sa ci si chce zahrat znovu :)
+
+          game.py- Paci sa mi vytvorenie tohto modulu pre ucely tejto ulohy.
+                   K funkcionalite ani ku stylizacii nemam ziadne vyhrady.
+                   Kod je dobre strukturovany a navyse komentovany, vdaka comu je lahko pochopitelne na co jednotlive metody (a zaroven cela trieda) sluzia.
+
+General comment- Aj napriek tomu, ze niektore metody v skriptoch su dost dlhe a bez komentarov, kod je na vysokej urovni.
+                 Ocenujem hlavne vytvaranie samostatnych modulov v niektorych ulohach s cim som sa pri ostatnych reviews zatial asi nestretol.
+                 Po funkcnej stranke pracuju vsetky ulohy korektne.
+                 V podstate som ziadnu zavaznu chybu ako vo funkcionalite tak ani v uprave nenasiel.
